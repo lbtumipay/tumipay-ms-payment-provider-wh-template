@@ -1,0 +1,33 @@
+{
+  "name": "tumipay-ms-payment-provider-template-tests",
+  "version": "1.0.0",
+  "description": "Integration tests for tumipay-ms-payment-provider-template using Newman",
+  "scripts": {
+    "test": "node ./scripts/run-tests.js --env=local --html",
+    "test:local": "node ./scripts/run-tests.js --env=local --html",
+    "test:dev": "node ./scripts/run-tests.js --env=dev --html",
+    "test:verbose": "node ./scripts/run-tests.js --env=local --verbose",
+    "test:ci": "node ./scripts/run-tests.js --env=local --ci",
+    "test:ci:dev": "node ./scripts/run-tests.js --env=dev --ci",
+    "test:payin": "newman run ./collections/payin_collection.json -e ./enviroments/local_environment.json --reporters cli,htmlextra --reporter-htmlextra-export ./reports/integration-test-report-payin.html",
+    "test:payout": "newman run ./collections/payout_collection.json -e ./enviroments/local_environment.json --reporters cli,htmlextra --reporter-htmlextra-export ./reports/integration-test-report-payout.html",
+    "test:webhook": "newman run ./collections/webhook_collection.json -e ./enviroments/local_environment.json --reporters cli,htmlextra --reporter-htmlextra-export ./reports/integration-test-report-webhook.html",
+    "test:payin:dev": "newman run ./collections/payin_collection.json -e ./enviroments/dev_environment.json --reporters cli,htmlextra --reporter-htmlextra-export ./reports/integration-test-report-payin-dev.html",
+    "test:payout:dev": "newman run ./collections/payout_collection.json -e ./enviroments/dev_environment.json --reporters cli,htmlextra --reporter-htmlextra-export ./reports/integration-test-report-payout-dev.html",
+    "test:webhook:dev": "newman run ./collections/webhook_collection.json -e ./enviroments/dev_environment.json --reporters cli,htmlextra --reporter-htmlextra-export ./reports/integration-test-report-webhook-dev.html",
+    "test:all": "newman run ./collections/payin_collection.json -e ./enviroments/local_environment.json --reporters cli,htmlextra --reporter-htmlextra-export ./reports/report-payin.html && newman run ./collections/payout_collection.json -e ./enviroments/local_environment.json --reporters cli,htmlextra --reporter-htmlextra-export ./reports/report-payout.html && newman run ./collections/query_collection.json -e ./enviroments/local_environment.json --reporters cli,htmlextra --reporter-htmlextra-export ./reports/report-query.html && newman run ./collections/webhook_collection.json -e ./enviroments/local_environment.json --reporters cli,htmlextra --reporter-htmlextra-export ./reports/report-webhook.html",
+    "test:all:ci": "newman run ./collections/payin_collection.json -e ./enviroments/local_environment.json --reporters cli,json --reporter-json-export ./reports/report-payin.json --bail && newman run ./collections/payout_collection.json -e ./enviroments/local_environment.json --reporters cli,json --reporter-json-export ./reports/report-payout.json --bail && newman run ./collections/query_collection.json -e ./enviroments/local_environment.json --reporters cli,json --reporter-json-export ./reports/report-query.json --bail && newman run ./collections/webhook_collection.json -e ./enviroments/local_environment.json --reporters cli,json --reporter-json-export ./reports/report-webhook.json --bail"
+  },
+  "keywords": [
+    "newman",
+    "postman",
+    "integration-tests",
+    "api-testing"
+  ],
+  "author": "TumiPay Architect Team",
+  "license": "ISC",
+  "devDependencies": {
+    "newman": "^6.1.1",
+    "newman-reporter-htmlextra": "^1.23.1"
+  }
+}

@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: transaction-orchestrator-test
+  
+  r2dbc:
+    url: r2dbc:h2:mem:///testdb
+    username: sa
+    password: 
+  
+  flyway:
+    enabled: false
+  
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+cache:
+  ttl: 3600
+
+logging:
+  level:
+    com.transaction.orchestrator: DEBUG

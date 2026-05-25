@@ -1,0 +1,144 @@
+name: Deploy to Production environment
+
+on:
+  workflow_dispatch:
+
+permissions:
+  id-token: write
+  contents: read
+
+env:
+  AWS_REGION: us-east-1
+  ENVIRONMENT: production
+  SERVICE_NAME: ppi-cobre-wh
+
+jobs:
+  # ============================================================
+  # Job 1: Tests & Quality Gates
+  # ============================================================
+  tests:
+    name: Run Tests Application
+    runs-on: self-hosted-runner-production
+    container:
+      image: ghcr.io/graalvm/native-image-community:21
+      options: --user root
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install Maven
+        run: |
+          microdnf install -y maven git
+          microdnf clean all
+
+      - name: Cache Maven Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Run Tests with Coverage
+        run: mvn -B -ntp clean verify -Djacoco.skip=false
+
+      - name: Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: |
+            target/surefire-reports/
+            target/jacoco-report/
+          retention-days: 7
+
+  # ============================================================
+  # Job 2: Build & Deploy
+  # ============================================================
+  deploy:
+    name: Build & Deploy to Production
+    runs-on: self-hosted-runner-production
+    needs: tests
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: arn:aws:iam::345594573245:role/github-oidc-role
+          role-session-name: github-oidc-role
+          aws-region: ${{ env.AWS_REGION }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "lts/*"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      # ----------------------------------------------------------
+      # Terraform Base: ECR Repository & Secrets Manager
+      # ----------------------------------------------------------
+      - name: Terraform Init Base
+        run: rm -rf .terraform && terraform init -backend-config="bucket=tumipay-terraform-state-production"
+        working-directory: terraform/base
+
+      - name: Terraform Plan Base
+        run: terraform plan -var-file="environments/production.tfvars"
+        working-directory: terraform/base
+
+      - name: Terraform Apply Base
+        run: terraform apply -auto-approve -var-file="environments/production.tfvars"
+        working-directory: terraform/base
+
+      - name: ECR data
+        id: ecr_data
+        working-directory: terraform/base
+        run: |
+          terraform init -backend-config="bucket=tumipay-terraform-state-production"
+          ecr_repository_url=$(terraform output -raw ecr_repository_url)
+          ecr_tag=${GITHUB_SHA::7}
+          echo "ecr_repository_url=$ecr_repository_url" >> $GITHUB_OUTPUT
+          echo "ecr_tag=$ecr_tag" >> $GITHUB_OUTPUT
+
+      # ----------------------------------------------------------
+      # Docker Build & Push
+      # ----------------------------------------------------------
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v2
+
+      - name: Build and push image
+        run: |
+          docker build \
+            --cache-from ${{ steps.ecr_data.outputs.ecr_repository_url }}:latest \
+            -t ${{ steps.ecr_data.outputs.ecr_repository_url }}:latest .
+          docker tag ${{ steps.ecr_data.outputs.ecr_repository_url }}:latest ${{ steps.ecr_data.outputs.ecr_repository_url }}:${{ steps.ecr_data.outputs.ecr_tag }}
+          docker push ${{ steps.ecr_data.outputs.ecr_repository_url }}:latest
+          docker push ${{ steps.ecr_data.outputs.ecr_repository_url }}:${{ steps.ecr_data.outputs.ecr_tag }}
+
+      # ----------------------------------------------------------
+      # Terraform Service: Kubernetes Deployment via ArgoCD
+      # ----------------------------------------------------------
+      - name: Terraform Init Service
+        run: rm -rf .terraform && terraform init -backend-config="bucket=tumipay-terraform-state-production"
+        working-directory: terraform/service
+
+      - name: Terraform Plan Service
+        run: |
+          terraform plan \
+            -var-file="environments/production.tfvars" \
+            -var="ecr_tag=${{ steps.ecr_data.outputs.ecr_tag }}" \
+            -var="argocd_target_branch=${GITHUB_REF_NAME}"
+        working-directory: terraform/service
+
+      - name: Terraform Apply Service
+        run: |
+          terraform apply -auto-approve \
+            -var-file="environments/production.tfvars" \
+            -var="ecr_tag=${{ steps.ecr_data.outputs.ecr_tag }}" \
+            -var="argocd_target_branch=${GITHUB_REF_NAME}"
+        working-directory: terraform/service

@@ -1,0 +1,464 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 
+         https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>4.0.2</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>com.tumipay.microservice</groupId>
+    <artifactId>tp-ppi-cobre-wh-svc</artifactId>
+    <version>1.0.0</version>
+
+    <name>TumiPay Payment Provider Webhook Integration Service</name>
+    <description>TumiPay Payment Provider Webhook Component</description>
+    
+    <properties>
+        <java.version>21</java.version>
+
+        <!-- Tumipay Lib Dependencies Versions -->
+        <tumipay.kit.version>0.0.1</tumipay.kit.version>
+
+        <!-- Lib Dependencies Versions -->
+        <mapstruct.version>1.6.2</mapstruct.version>
+        <lombok.version>1.18.42</lombok.version>
+        <springdoc.version>2.3.0</springdoc.version>
+        <findbugs.version>3.0.1</findbugs.version>
+        <reactor.core.version>3.5.10</reactor.core.version>
+        <reactor.context.propagation.version>1.0.5</reactor.context.propagation.version>
+
+        <!-- GraalVM Dependencies Versions -->
+        <graalvm.version>21.0.0</graalvm.version>
+        <graalvm.reachability.version>0.11.5</graalvm.reachability.version>
+
+        <!-- Plugins Dependencies Versions -->
+        <maven.compiler.version>3.11.0</maven.compiler.version>
+        <lombok.mapstruct.binding.version>0.2.0</lombok.mapstruct.binding.version>
+        <jacoco.version>0.8.11</jacoco.version>
+        <spotbugs.version>4.9.8.3</spotbugs.version>
+    </properties>
+
+    <packaging>jar</packaging>
+    <url>https://github.com/TumiPay/tumipay-microservice-template</url>
+
+    <licenses>
+        <license>
+            <name>Proprietary License - TumiPay</name>
+            <url>https://tumipay.co/legal/license</url>
+            <distribution>repo</distribution>
+            <comments>
+                Unauthorized copying, modification, distribution, or use is strictly prohibited.
+                Designed exclusively for internal microservices development at TumiPay SAS.
+            </comments>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>architect-team</id>
+            <name>TumiPay Architecture and Engineering Team</name>
+            <email>admin.it@tumipay.co</email>
+            <organization>TumiPay</organization>
+            <organizationUrl>https://tumipay.co</organizationUrl>
+            <roles>
+                <role>architect</role>
+                <role>maintainer</role>
+                <role>reviewer</role>
+            </roles>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:https://github.com/TumiPay/tp-orchestrator-payin-ms.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com/TumiPay/tp-orchestrator-payin-ms.git</developerConnection>
+        <tag>HEAD</tag>
+        <url>https://github.com/TumiPay/tp-orchestrator-payin-ms</url>
+    </scm>
+
+    <repositories>
+        <repository>
+            <id>codeartifact</id>
+            <url>${env.CODEARTIFACT_URL}</url>
+        </repository>
+    </repositories>
+    
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webflux</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-core</artifactId>
+            <version>${reactor.core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>io.micrometer</groupId>
+            <artifactId>context-propagation</artifactId>
+            <version>${reactor.context.propagation.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-r2dbc</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-starter-logging</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-log4j2</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.zaxxer</groupId>
+            <artifactId>HikariCP</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>r2dbc-postgresql</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>annotations</artifactId>
+            <version>${findbugs.version}</version>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-jdbc</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>com.google.code.gson</groupId>
+            <artifactId>gson</artifactId>
+            <version>${gson.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>${flyway.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>${lombok.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.mapstruct</groupId>
+            <artifactId>mapstruct</artifactId>
+            <version>${mapstruct.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>io.r2dbc</groupId>
+            <artifactId>r2dbc-h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.projectreactor</groupId>
+            <artifactId>reactor-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- GraalVM Native Image Dependencies -->
+        <dependency>
+            <groupId>org.graalvm.buildtools</groupId>
+            <artifactId>graalvm-reachability-metadata</artifactId>
+            <version>${graalvm.reachability.version}</version>
+            <type>pom</type>
+            <scope>provided</scope>
+        </dependency>
+    </dependencies>
+    
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>process-aot</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
+                <configuration>
+                    <release>${java.version}</release>
+
+                    <compilerArgs>
+                        <arg>-parameters</arg>
+                        <arg>-implicit:class</arg>
+                    </compilerArgs>
+
+                    <annotationProcessorPaths>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                            <version>${lombok.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.mapstruct</groupId>
+                            <artifactId>mapstruct-processor</artifactId>
+                            <version>${mapstruct.version}</version>
+                        </path>
+                        <path>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok-mapstruct-binding</artifactId>
+                            <version>${lombok.mapstruct.binding.version}</version>
+                        </path>
+                    </annotationProcessorPaths>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>${jacoco.version}</version>
+
+                <executions>
+
+                    <!-- 1. Instrumentation -->
+                    <execution>
+                        <id>prepare-agent</id>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+
+                    <!-- 2. Report -->
+                    <execution>
+                        <id>report</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                        <configuration>
+                            <!-- Output Jacoco Report -->
+                            <dataFile>${project.build.directory}/jacoco.exec</dataFile>
+                            <outputDirectory>${project.build.directory}/jacoco-report</outputDirectory>
+
+                            <excludes>
+                                <exclude>com.tumipay.microservice/**</exclude>
+                                <exclude>com.tumipay.microservice.shared.dto/**</exclude>
+                                <exclude>com.tumipay.microservice.domain.model/**</exclude>
+                                <exclude>com.tumipay.microservice.domain.component.enums/**</exclude>
+                                <exclude>com.tumipay.microservice.infrastructure.component.dto/**</exclude>
+                                <exclude>com.tumipay.microservice.infrastructure.component.enums/**</exclude>
+                                <exclude>com.tumipay.microservice.infrastructure.component.constant/**</exclude>
+                                <exclude>com.tumipay.microservice.infrastructure.adapter.input.http.request/**</exclude>
+                                <exclude>com.tumipay.microservice.infrastructure.adapter.input.http.response/**</exclude>
+                                <exclude>com.tumipay.microservice.infrastructure.adapter.output.cache.redis.entity/**</exclude>
+                                <exclude>com.tumipay.microservice.infrastructure.adapter.output.cache.redis.repository/**</exclude>
+
+                                <!-- Proxies Spring Exclusions -->
+                                <exclude>**/*$$*</exclude>
+                                <exclude>**/*CGLIB*</exclude>
+
+                                <!-- Configuration Exclusions -->
+                                <exclude>**/config/**</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+
+                    <!-- 3. Coverage Validation for Pipeline -->
+                    <execution>
+                        <id>jacoco-check</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>check</goal>
+                        </goals>
+                        <configuration>
+                            <excludes>
+                                <exclude>com.tumipay.microservice/**</exclude>
+                                <exclude>com.tumipay.microservice.shared.dto/**</exclude>
+                                <exclude>com.tumipay.microservice.domain.model/**</exclude>
+                                <exclude>com.tumipay.microservice.domain.component.enums/**</exclude>
+                                <exclude>com.tumipay.microservice.infrastructure.component.dto/**</exclude>
+                                <exclude>com.tumipay.microservice.infrastructure.component.enums/**</exclude>
+                                <exclude>com.tumipay.microservice.infrastructure.component.constant/**</exclude>
+                                <exclude>com.tumipay.microservice.infrastructure.adapter.input.http.request/**</exclude>
+                                <exclude>com.tumipay.microservice.infrastructure.adapter.input.http.response/**</exclude>
+                                <exclude>com.tumipay.microservice.infrastructure.adapter.output.cache.redis.entity/**</exclude>
+                                <exclude>com.tumipay.microservice.infrastructure.adapter.output.cache.redis.repository/**</exclude>
+
+                                <exclude>**/*$$*</exclude>
+                                <exclude>**/*CGLIB*</exclude>
+                                <exclude>**/config/**</exclude>
+                            </excludes>
+                            <rules>
+                                <rule>
+                                    <element>PACKAGE</element>
+                                    <limits>
+                                        <limit>
+                                            <counter>LINE</counter>
+                                            <value>COVEREDRATIO</value>
+                                            <minimum>0.80</minimum>
+                                        </limit>
+                                    </limits>
+                                </rule>
+                            </rules>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>com.github.spotbugs</groupId>
+                <artifactId>spotbugs-maven-plugin</artifactId>
+                <version>${spotbugs.version}</version>
+                <configuration>
+                    <effort>Max</effort>
+                    <threshold>Low</threshold>
+                    <xmlOutput>true</xmlOutput>
+                    <excludeFilterFile>config/spotbugs/spotbugs-exclude.xml</excludeFilterFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>spotbugs</goal>
+                            <goal>check</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.graalvm.buildtools</groupId>
+                <artifactId>native-maven-plugin</artifactId>
+                <configuration>
+                    <imageName>microservice</imageName>
+                    <mainClass>com.tumipay.microservice.MicroserviceApplication</mainClass>
+                    <buildArgs>
+                        <buildArg>--static-nolibc</buildArg>
+                        <buildArg>--enable-native-access=ALL-UNNAMED</buildArg>
+                        <buildArg>-H:+ReportExceptionStackTraces</buildArg>
+                        <buildArg>-H:+UnlockExperimentalVMOptions</buildArg>
+                        <buildArg>-H:+EnableAllSecurityServices</buildArg>
+                        <buildArg>-Duser.country=US</buildArg>
+                        <buildArg>-Duser.language=en</buildArg>
+                    </buildArgs>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

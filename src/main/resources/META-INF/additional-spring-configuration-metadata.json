@@ -1,0 +1,600 @@
+{
+    "properties": [
+        {
+            "name": "server.compression.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Enables response compression for the server."
+        },
+        {
+            "name": "server.compression.min-response-size",
+            "type": "java.lang.Integer",
+            "description": "Minimum response size in bytes that will be compressed. Responses smaller than this size will not be compressed."
+        },
+        {
+            "name": "spring.application.version",
+            "type": "java.lang.String",
+            "description": "A description for 'spring.application.version'."
+        },
+        {
+            "name": "spring.application.log",
+            "type": "java.lang.String",
+            "description": "A description for 'spring.application.log'."
+        },
+        {
+            "name": "spring.main.lazy-initialization",
+            "type": "java.lang.Boolean",
+            "description": "Flag to enable or disable lazy initialization of Spring beans. When set to true, beans will be initialized on demand rather than at startup, which can improve startup time but may lead to longer response times for the first request."
+        },
+        {
+            "name": "spring.r2dbc.url",
+            "type": "java.lang.String",
+            "description": "R2DBC connection URL used by the application to connect to the PostgreSQL database reactively."
+        },
+        {
+            "name": "spring.r2dbc.username",
+            "type": "java.lang.String",
+            "description": "Database username used by the R2DBC reactive connection."
+        },
+        {
+            "name": "spring.r2dbc.password",
+            "type": "java.lang.String",
+            "description": "Database password used by the R2DBC reactive connection."
+        },
+        {
+            "name": "spring.r2dbc.pool.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Flag to enable or disable the R2DBC connection pool.",
+            "defaultValue": true
+        },
+        {
+            "name": "spring.r2dbc.pool.initial-size",
+            "type": "java.lang.Integer",
+            "description": "Initial number of connections created in the R2DBC connection pool.",
+            "defaultValue": 10
+        },
+        {
+            "name": "spring.r2dbc.pool.max-size",
+            "type": "java.lang.Integer",
+            "description": "Maximum number of connections allowed in the R2DBC connection pool.",
+            "defaultValue": 20
+        },
+        {
+            "name": "spring.r2dbc.pool.max-idle-time",
+            "type": "java.time.Duration",
+            "description": "Maximum amount of time a connection can remain idle in the R2DBC pool before being closed.",
+            "defaultValue": "30m"
+        },
+        {
+            "name": "spring.data.redis.host",
+            "type": "java.lang.String",
+            "description": "Redis server host used by the application for caching and temporary data storage.",
+            "defaultValue": "0.0.0.1"
+        },
+        {
+            "name": "spring.data.redis.port",
+            "type": "java.lang.Integer",
+            "description": "Redis server port used by the application.",
+            "defaultValue": 6379
+        },
+        {
+            "name": "spring.data.redis.username",
+            "type": "java.lang.String",
+            "description": "Username used to authenticate with the Redis server."
+        },
+        {
+            "name": "spring.data.redis.password",
+            "type": "java.lang.String",
+            "description": "Password used to authenticate with the Redis server."
+        },
+        {
+            "name": "spring.data.redis.database",
+            "type": "java.lang.Integer",
+            "description": "Redis logical database index used by the application.",
+            "defaultValue": 0
+        },
+        {
+            "name": "spring.data.redis.timeout",
+            "type": "java.time.Duration",
+            "description": "Maximum duration to wait for Redis operations before timing out.",
+            "defaultValue": "5s"
+        },
+        {
+            "name": "spring.data.redis.ssl.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Flag to enable or disable SSL/TLS for Redis connections.",
+            "defaultValue": false
+        },
+        {
+            "name": "spring.data.redis.repositories.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Flag to enable or disable Spring Data Redis repositories.",
+            "defaultValue": false
+        },
+        {
+            "name": "spring.version",
+            "type": "java.lang.String",
+            "description": "A description for 'spring.version'."
+        },
+        {
+            "name": "configMap.message",
+            "type": "java.lang.String",
+            "description": "A description for 'configMap.message'."
+        },
+        {
+            "name": "tumipay.security.internal.api-key",
+            "type": "java.lang.String",
+            "description": "Internal API key used for authenticating trusted internal requests between TumiPay services."
+        },
+        {
+            "name": "tumipay.microservice.name",
+            "type": "java.lang.String",
+            "description": "The name of the TumiPay microservice."
+        },
+        {
+            "name": "tumipay.microservice.version",
+            "type": "java.lang.String",
+            "description": "The version of the TumiPay microservice."
+        },
+        {
+            "name": "tumipay.microservice.environment",
+            "type": "java.lang.String",
+            "description": "The environment where the microservice is running."
+        },
+        {
+            "name": "tumipay.microservice.startup-log-enabled",
+            "type": "java.lang.Boolean",
+            "description": "Enable or disable startup logs for the microservice."
+        },
+        {
+            "name": "tumipay.microservice.startup-log-level",
+            "type": "java.lang.String",
+            "description": "The log level for startup logs."
+        },
+        {
+            "name": "tumipay.microservice.spring-version",
+            "type": "java.lang.String",
+            "description": "The Spring framework version."
+        },
+        {
+            "name": "tumipay.microservice.logs-path",
+            "type": "java.lang.String",
+            "description": "The path where logs are stored."
+        },
+        {
+            "name": "tumipay.microservice.port",
+            "type": "java.lang.Integer",
+            "description": "The port on which the microservice runs."
+        },
+        {
+            "name": "tumipay.microservice.context-path",
+            "type": "java.lang.String",
+            "description": "The servlet context path of the microservice."
+        },
+        {
+            "name": "tumipay.microservice.description",
+            "type": "java.lang.String",
+            "description": "TumiPay Microservice Template."
+        },
+        {
+            "name": "tumipay.payment-provider.code",
+            "type": "java.lang.String",
+            "description": "Payment provider code identifier."
+        },
+        {
+            "name": "tumipay.payment-provider.name",
+            "type": "java.lang.String",
+            "description": "Payment provider display name."
+        },
+        {
+            "name": "tumipay.payment-provider.timeout",
+            "type": "java.lang.Integer",
+            "description": "Payment provider common timeout in milliseconds."
+        },
+        {
+            "name": "tumipay.payment-provider.payout-source-account-id",
+            "type": "java.lang.String",
+            "description": "Source account identifier used by the payment provider to originate payout transactions.",
+            "defaultValue": ""
+        },
+        {
+            "name": "tumipay.common-configuration.amount-scale",
+            "type": "java.lang.Integer",
+            "description": "Defines the number of decimal places (scale) to be used when processing and storing monetary amounts across the platform, ensuring consistency in rounding and precision for financial calculations."
+        },
+        {
+            "name": "tumipay.common-configuration.payin-service-enabled",
+            "type": "java.lang.Boolean",
+            "description": "Flag to enable or disable the PayIn service in TumiPay, allowing for dynamic control over the availability of payment processing features without requiring code changes or redeployments."
+        },
+        {
+            "name": "tumipay.common-configuration.payout-service-enabled",
+            "type": "java.lang.Boolean",
+            "description": "Flag to enable or disable the PayOut service in TumiPay, allowing for dynamic control over the availability of payment processing features without requiring code changes or redeployments."
+        },
+        {
+            "name": "tumipay.common-configuration.amount-rounding-mode",
+            "type": "java.lang.String",
+            "description": "Specifies the rounding mode used for monetary calculations, following standard rounding strategies (e.g., HALF_UP, HALF_EVEN) to ensure deterministic and consistent financial results."
+        },
+        {
+            "name": "tumipay.payment-provider.security.base-url",
+            "type": "java.lang.String",
+            "description": "Payment provider security base url integration."
+        },
+        {
+            "name": "tumipay.payment-provider.security.endpoints.generate-token-path",
+            "type": "java.lang.String",
+            "description": "Payment provider security generate token endpoint url integration."
+        },
+        {
+            "name": "tumipay.payment-provider.security.endpoints.refresh-token-path",
+            "type": "java.lang.String",
+            "description": "Payment provider security generate token endpoint url integration."
+        },
+        {
+            "name": "tumipay.payment-provider.integration.base-url",
+            "type": "java.lang.String",
+            "description": "Payment provider transaction base url integration."
+        },
+        {
+            "name": "tumipay.payment-provider.integration.endpoints.payin-transaction-path",
+            "type": "java.lang.String",
+            "description": "Payment provider Transaction PayIn endpoint url integration."
+        },
+        {
+            "name": "tumipay.payment-provider.integration.endpoints.payout-transaction-path",
+            "type": "java.lang.String",
+            "description": "Payment provider Transaction PayOut endpoint url integration."
+        },
+        {
+            "name": "tumipay.payment-provider.integration.endpoints.get-transaction-path",
+            "type": "java.lang.String",
+            "description": "Payment provider Transaction Get Transaction endpoint url integration."
+        },
+        {
+            "name": "tumipay.payment-provider.authorization.expiration-time-ms",
+            "type": "java.lang.Long",
+            "description": "Payment provider Authorization Expiration Time in Milliseconds."
+        },
+        {
+            "name": "tumipay.payment-provider.authorization.refresh-threshold-ms",
+            "type": "java.lang.Long",
+            "description": "Payment provider Authorization Threshold Time in Milliseconds."
+        },
+        {
+            "name": "tumipay.payment-provider.authorization.scheduler-fixed-delay-ms",
+            "type": "java.lang.Long",
+            "description": "Fixed delay in milliseconds for the provider authorization scheduler."
+        },
+        {
+            "name": "tumipay.schedulers.scheduler-authorization-refresh.enabled",
+            "type": "java.lang.Boolean",
+            "description": "TumiPay Flag to enable or disable the provider authorization refresh scheduler."
+        },
+        {
+            "name": "tumipay.schedulers.scheduler-authorization-refresh.scheduler-fixed-delay-ms",
+            "type": "java.lang.Long",
+            "description": "TumiPay Fixed delay in milliseconds for the provider authorization refresh scheduler."
+        },
+        {
+            "name": "tumipay.schedulers.scheduler-authorization-refresh.scheduler-initial-delay-ms",
+            "type": "java.lang.Long",
+            "description": "TumiPay Initial delay in milliseconds for the provider authorization refresh scheduler."
+        },
+        {
+            "name": "tumipay.schedulers.scheduler-webhook-dispatcher-scheduler.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Flag to enable or disable the webhook worker scheduler.",
+            "defaultValue": true
+        },
+        {
+            "name": "tumipay.schedulers.scheduler-webhook-dispatcher.scheduler-initial-delay-ms",
+            "type": "java.lang.Long",
+            "description": "Initial delay in milliseconds before the webhook worker scheduler starts.",
+            "defaultValue": 15000
+        },
+        {
+            "name": "tumipay.schedulers.scheduler-webhook-dispatcher.scheduler-fixed-delay-ms",
+            "type": "java.lang.Long",
+            "description": "Fixed delay in milliseconds between executions of the webhook worker scheduler.",
+            "defaultValue": 30000
+        },
+        {
+            "name": "tumipay.schedulers.scheduler-webhook-receiver.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Flag to enable or disable the webhook receiver scheduler.",
+            "defaultValue": true
+        },
+        {
+            "name": "tumipay.schedulers.scheduler-webhook-receiver.scheduler-initial-delay-ms",
+            "type": "java.lang.Long",
+            "description": "Initial delay in milliseconds before the webhook receiver scheduler starts.",
+            "defaultValue": 5000
+        },
+        {
+            "name": "tumipay.schedulers.scheduler-webhook-receiver.scheduler-fixed-delay-ms",
+            "type": "java.lang.Long",
+            "description": "Fixed delay in milliseconds between executions of the webhook receiver scheduler.",
+            "defaultValue": 15000
+        },
+        {
+            "name": "spring.flyway.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Enables or disables Flyway database migrations."
+        },
+        {
+            "name": "spring.flyway.url",
+            "type": "java.lang.String",
+            "description": "JDBC URL used by Flyway for database migrations."
+        },
+        {
+            "name": "spring.flyway.user",
+            "type": "java.lang.String",
+            "description": "Database username used by Flyway."
+        },
+        {
+            "name": "spring.flyway.password",
+            "type": "java.lang.String",
+            "description": "Database password used by Flyway."
+        },
+        {
+            "name": "spring.flyway.baseline-on-migrate",
+            "type": "java.lang.Boolean",
+            "description": "Whether to baseline an existing schema on migrate."
+        },
+        {
+            "name": "spring.flyway.create-schemas",
+            "type": "java.lang.Boolean",
+            "description": "Whether Flyway should create schemas if they do not exist."
+        },
+        {
+            "name": "spring.flyway.schemas",
+            "type": "java.lang.String",
+            "description": "Comma-separated list of schemas managed by Flyway."
+        },
+        {
+            "name": "spring.flyway.default-schema",
+            "type": "java.lang.String",
+            "description": "Default schema used by Flyway."
+        },
+        {
+            "name": "spring.flyway.locations",
+            "type": "java.lang.String",
+            "description": "Locations of migration scripts."
+        },
+        {
+            "name": "spring.datasource.url",
+            "type": "java.lang.String",
+            "description": "JDBC URL used by Flyway for database migrations."
+        },
+        {
+            "name": "spring.datasource.username",
+            "type": "java.lang.String",
+            "description": "Database username used by Flyway."
+        },
+        {
+            "name": "spring.datasource.password",
+            "type": "java.lang.String",
+            "description": "Database password used by Flyway."
+        },
+        {
+            "name": "spring.datasource.driver-class-name",
+            "type": "java.lang.String",
+            "description": "Fully qualified name of the JDBC driver. Auto-detected based on the URL by default."
+        },
+        {
+            "name": "spring.datasource.hikari.maximum-pool-size",
+            "type": "java.lang.Integer",
+            "description": "Maximum number of connections in the Hikari connection pool."
+        },
+        {
+            "name": "spring.datasource.hikari.minimum-idle",
+            "type": "java.lang.Integer",
+            "description": "Minimum number of idle connections in the Hikari connection pool."
+        },
+        {
+            "name": "spring.datasource.hikari.idle-timeout",
+            "type": "java.lang.Long",
+            "description": "Maximum amount of time that a connection is allowed to sit idle in the Hikari connection pool."
+        },
+        {
+            "name": "spring.datasource.hikari.max-lifetime",
+            "type": "java.lang.Long",
+            "description": "Maximum lifetime of a connection in the Hikari connection pool."
+        },
+        {
+            "name": "spring.datasource.hikari.connection-timeout",
+            "type": "java.lang.Long",
+            "description": "Maximum number of milliseconds that a client will wait for a connection from the Hikari connection pool."
+        },
+        {
+            "name": "tumipay.payment-gateway.base-url",
+            "type": "java.lang.String",
+            "description": "Base URL of the TumiPay payment gateway used to dispatch webhook events and interact with gateway APIs.",
+            "defaultValue": "https://api.tumipay.com/gateway"
+        },
+        {
+            "name": "tumipay.payment-gateway.api-key",
+            "type": "java.lang.String",
+            "description": "API key used to authenticate requests sent to the TumiPay payment gateway."
+        },
+        {
+            "name": "tumipay.payment-gateway.timeout",
+            "type": "java.lang.Long",
+            "description": "Timeout in milliseconds for requests sent to the TumiPay payment gateway.",
+            "defaultValue": 30000
+        },
+        {
+            "name": "tumipay.payment-gateway.endpoints.webhook-event-path",
+            "type": "java.lang.String",
+            "description": "Relative path of the payment gateway endpoint used to dispatch webhook payment events.",
+            "defaultValue": "/v1/webhook/payment-event"
+        },
+        {
+            "name": "tumipay.webhook-dispatcher.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Flag to enable or disable the webhook worker processing component.",
+            "defaultValue": true
+        },
+        {
+            "name": "tumipay.webhook-dispatcher.worker-id",
+            "type": "java.lang.String",
+            "description": "Unique identifier for the webhook worker instance. Used to differentiate workers in distributed deployments."
+        },
+        {
+            "name": "tumipay.webhook-dispatcher.batch-size",
+            "type": "java.lang.Integer",
+            "description": "Number of webhook events processed per batch execution by the webhook worker.",
+            "defaultValue": 10
+        },
+        {
+            "name": "tumipay.webhook-dispatcher.max-retry-count",
+            "type": "java.lang.Integer",
+            "description": "Maximum number of retry attempts for a failed webhook event before it is marked as permanently failed.",
+            "defaultValue": 5
+        },
+        {
+            "name": "tumipay.webhook-dispatcher.concurrency",
+            "type": "java.lang.Integer",
+            "description": "Number of concurrent threads or coroutines used by the webhook worker to process events in parallel.",
+            "defaultValue": 10
+        },
+        {
+            "name": "tumipay.webhook-dispatcher.retry-backoff-seconds",
+            "type": "java.lang.Long",
+            "description": "Backoff time in seconds before retrying a failed webhook event.",
+            "defaultValue": 30
+        },
+        {
+            "name": "tumipay.webhook-dispatcher.worker-timeout-minutes",
+            "type": "java.lang.Long",
+            "description": "Timeout in minutes for a single webhook worker execution cycle. Events being processed longer than this threshold may be re-queued.",
+            "defaultValue": 5
+        },
+        {
+            "name": "tumipay.webhook-dispatcher.validating-timeout-minutes",
+            "type": "java.lang.Long",
+            "description": "Timeout in minutes for webhook events stuck in a validating state. Events exceeding this threshold will be reassigned or marked as failed.",
+            "defaultValue": 60
+        },
+        {
+            "name": "tumipay.authorization-refresh.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Flag to enable or disable the authorization refresh component responsible for processing the authorization events.",
+            "defaultValue": true
+        },
+        {
+            "name": "tumipay.webhook-receiver.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Flag to enable or disable the webhook receiver component responsible for ingesting incoming webhook events.",
+            "defaultValue": true
+        },
+        {
+            "name": "tumipay.webhook-receiver.batch-size",
+            "type": "java.lang.Integer",
+            "description": "Number of incoming webhook events fetched and processed per batch by the webhook receiver.",
+            "defaultValue": 20
+        },
+        {
+            "name": "logging.level.com.tumipay.microservice",
+            "type": "java.lang.String",
+            "description": "Log level for TumiPay microservice.",
+            "defaultValue": "INFO"
+        },
+        {
+            "name": "logging.level.org.springframework.r2dbc",
+            "type": "java.lang.String",
+            "description": "Log level for Spring R2DBC.",
+            "defaultValue": "INFO"
+        },
+        {
+            "name": "logging.level.org.springframework.boot.autoconfigure",
+            "type": "java.lang.String",
+            "description": "Log level for Spring Boot auto-configuration.",
+            "defaultValue": "INFO"
+        },
+        {
+            "name": "logging.level.org.flywaydb",
+            "type": "java.lang.String",
+            "description": "Log level for Flyway database migration framework.",
+            "defaultValue": "INFO"
+        },
+        {
+            "name": "webclient.pool.max-connections",
+            "type": "java.lang.Integer",
+            "description": "Maximum number of connections in the WebClient connection pool.",
+            "defaultValue": 100
+        },
+        {
+            "name": "webclient.pool.pending-acquire-timeout",
+            "type": "java.lang.String",
+            "description": "Timeout duration for acquiring a pending connection from the WebClient pool.",
+            "defaultValue": "30s"
+        },
+        {
+            "name": "webclient.pool.max-idle-time",
+            "type": "java.lang.String",
+            "description": "Maximum idle time for connections in the WebClient pool before they are closed.",
+            "defaultValue": "20s"
+        },
+        {
+            "name": "webclient.pool.max-life-time",
+            "type": "java.lang.String",
+            "description": "Maximum lifetime for connections in the WebClient pool.",
+            "defaultValue": "5m"
+        },
+        {
+            "name": "webclient.pool.evict-in-background",
+            "type": "java.lang.String",
+            "description": "Background eviction interval for idle connections in the WebClient pool.",
+            "defaultValue": "30s"
+        },
+        {
+            "name": "webclient.timeout.connect",
+            "type": "java.lang.String",
+            "description": "Connection timeout for WebClient requests.",
+            "defaultValue": "5s"
+        },
+        {
+            "name": "webclient.timeout.response",
+            "type": "java.lang.String",
+            "description": "Response timeout for WebClient requests.",
+            "defaultValue": "30s"
+        },
+        {
+            "name": "webclient.tcp.keep-alive",
+            "type": "java.lang.Boolean",
+            "description": "Enable TCP keep-alive for WebClient connections.",
+            "defaultValue": true
+        },
+        {
+            "name": "tumipay.webhook-signature.enabled",
+            "type": "java.lang.Boolean",
+            "description": "Flag to enable or disable webhook signature validation for incoming webhook requests.",
+            "defaultValue": true
+        },
+        {
+            "name": "tumipay.webhook-signature.tolerance-seconds",
+            "type": "java.lang.Long",
+            "description": "Maximum allowed time difference in seconds between the webhook event timestamp and the current server time to prevent replay attacks.",
+            "defaultValue": 300
+        },
+        {
+            "name": "tumipay.webhook-signature.signature-header",
+            "type": "java.lang.String",
+            "description": "HTTP header name containing the webhook signature generated by the payment provider.",
+            "defaultValue": "event-signature"
+        },
+        {
+            "name": "tumipay.webhook-signature.timestamp-header",
+            "type": "java.lang.String",
+            "description": "HTTP header name containing the webhook event timestamp used during signature validation.",
+            "defaultValue": "event-timestamp"
+        },
+        {
+            "name": "tumipay.webhook-signature.secret",
+            "type": "java.lang.String",
+            "description": "Secret key used to validate webhook signatures generated by the payment provider."
+        }
+    ]
+}

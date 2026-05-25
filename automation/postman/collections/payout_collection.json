@@ -1,0 +1,207 @@
+{
+  "info": {
+    "name": "TumiPay - PayOut Tests",
+    "_postman_id": "ba16c445-3420-4691-b049-c5a7ba350eb2",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01_happy_path",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Request-ID",
+            "value": "{{request_id}}"
+          },
+          {
+            "key": "X-Idempotency-Key",
+            "value": "{{idempotency_key}}"
+          },
+          {
+            "key": "X-Merchant-ID",
+            "value": "{{merchant_id}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"transaction\": {\n    \"transaction_id\": \"{{transaction_id}}\",\n    \"reference_id\": \"ref-001\",\n    \"amount\": {\n      \"value\": 100000,\n      \"currency\": \"COP\"\n    },\n    \"country\": \"CO\",\n    \"payment_method\": \"BANK_TRANSFER\",\n    \"description\": \"Payout test transaction\",\n    \"expiration_minutes\": 30\n  },\n  \"merchant\": {\n    \"merchant_id\": \"m-001\",\n    \"code\": \"TUMIPAY\",\n    \"name\": \"TumiPay Store\",\n    \"document\": {\n      \"type\": \"NIT\",\n      \"number\": \"900123456\"\n    }\n  },\n  \"beneficiary\": {\n    \"beneficiary_id\": \"ben-001\",\n    \"document\": {\n      \"document_type\": \"CC\",\n      \"document_number\": \"123456789\"\n    },\n    \"first_name\": \"Juan\",\n    \"last_name\": \"Perez\",\n    \"email\": \"juan.perez@email.com\",\n    \"phone\": \"3001234567\",\n    \"bank_account\": {\n      \"account_number\": \"1234567890\",\n      \"account_type\": \"SAVINGS\",\n      \"bank_code\": \"001\"\n    }\n  },\n  \"webhook_url\": \"https://webhook.site/your-endpoint\",\n  \"metadata\": {\n    \"notes\": \"Test payout\",\n    \"origin\": \"tumi_test\"\n  }\n}"
+        },
+        "url": "{{baseUrl}}/tp/payment/adapter/v1/payout/transaction"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.variables.set('request_id', pm.variables.replaceIn('{{$guid}}'));",
+              "pm.variables.set('idempotency_key', pm.variables.replaceIn('{{$guid}}'));",
+              "pm.variables.set('transaction_id', pm.variables.replaceIn('{{$guid}}'));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('SUCCESS', () => pm.expect(json.status).to.eql('SUCCESS'));",
+              "pm.test('Async flag', () => pm.expect(json.data.synchronous).to.eql(false));",
+              "pm.environment.set('transaction_id', json.data.transaction_id);",
+              "pm.environment.set('adapter_transaction_id', json.data.adapter_transaction_id);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02_validation_error_missing_beneficiary",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"transaction\": {\n    \"transaction_id\": \"x\"\n  }\n}"
+        },
+        "url": "{{baseUrl}}/tp/payment/adapter/v1/payout/transaction"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('VALIDATION_ERROR', () => {",
+              "  pm.expect(json.code).to.eql('VALIDATION_ERROR');",
+              "  pm.expect(json.status).to.eql('ERROR');",
+              "});"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03_idempotency_first_call",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Request-ID",
+            "value": "{{request_id}}"
+          },
+          {
+            "key": "X-Idempotency-Key",
+            "value": "{{payout_idem_key}}"
+          },
+          {
+            "key": "X-Merchant-ID",
+            "value": "{{merchant_id}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"transaction\": {\n    \"transaction_id\": \"{{transaction_id}}\",\n    \"reference_id\": \"ref-idem-001\",\n    \"amount\": {\n      \"value\": 100000,\n      \"currency\": \"COP\"\n    },\n    \"country\": \"CO\",\n    \"payment_method\": \"BANK_TRANSFER\",\n    \"description\": \"Test idempotencia primera llamada\",\n    \"expiration_minutes\": 30\n  },\n  \"merchant\": {\n    \"merchant_id\": \"m-001\",\n    \"code\": \"TUMIPAY\",\n    \"name\": \"TumiPay Store\",\n    \"document\": {\n      \"type\": \"NIT\",\n      \"number\": \"900123456\"\n    }\n  },\n  \"beneficiary\": {\n    \"beneficiary_id\": \"ben-idem-001\",\n    \"document\": {\n      \"document_type\": \"CC\",\n      \"document_number\": \"123456789\"\n    },\n    \"first_name\": \"Juan\",\n    \"last_name\": \"Perez\",\n    \"email\": \"juan.perez@email.com\",\n    \"phone\": \"3001234567\",\n    \"bank_account\": {\n      \"account_number\": \"1234567890\",\n      \"account_type\": \"SAVINGS\",\n      \"bank_code\": \"001\"\n    }\n  },\n  \"webhook_url\": \"https://webhook.site/your-endpoint\",\n  \"metadata\": {\n    \"notes\": \"Primera llamada idempotencia\",\n    \"origin\": \"tumi_test\"\n  }\n}"
+        },
+        "url": "{{baseUrl}}/tp/payment/adapter/v1/payout/transaction"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const idemKey = pm.variables.replaceIn('{{$guid}}');",
+              "pm.environment.set('payout_idem_key', idemKey);",
+              "pm.variables.set('request_id', pm.variables.replaceIn('{{$guid}}'));",
+              "pm.variables.set('transaction_id', pm.variables.replaceIn('{{$guid}}'));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Status 200 on first idempotency call', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('SUCCESS on first idempotency call', () => pm.expect(json.status).to.eql('SUCCESS'));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "04_idempotency_duplicate",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Request-ID",
+            "value": "{{request_id}}"
+          },
+          {
+            "key": "X-Idempotency-Key",
+            "value": "{{payout_idem_key}}"
+          },
+          {
+            "key": "X-Merchant-ID",
+            "value": "{{merchant_id}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"transaction\": {\n    \"transaction_id\": \"{{transaction_id}}\",\n    \"reference_id\": \"ref-idem-001\",\n    \"amount\": {\n      \"value\": 100000,\n      \"currency\": \"COP\"\n    },\n    \"country\": \"CO\",\n    \"payment_method\": \"BANK_TRANSFER\",\n    \"description\": \"Test idempotencia segunda llamada\",\n    \"expiration_minutes\": 30\n  },\n  \"merchant\": {\n    \"merchant_id\": \"m-001\",\n    \"code\": \"TUMIPAY\",\n    \"name\": \"TumiPay Store\",\n    \"document\": {\n      \"type\": \"NIT\",\n      \"number\": \"900123456\"\n    }\n  },\n  \"beneficiary\": {\n    \"beneficiary_id\": \"ben-idem-001\",\n    \"document\": {\n      \"document_type\": \"CC\",\n      \"document_number\": \"123456789\"\n    },\n    \"first_name\": \"Juan\",\n    \"last_name\": \"Perez\",\n    \"email\": \"juan.perez@email.com\",\n    \"phone\": \"3001234567\",\n    \"bank_account\": {\n      \"account_number\": \"1234567890\",\n      \"account_type\": \"SAVINGS\",\n      \"bank_code\": \"001\"\n    }\n  },\n  \"webhook_url\": \"https://webhook.site/your-endpoint\",\n  \"metadata\": {\n    \"notes\": \"Segunda llamada idempotencia\",\n    \"origin\": \"tumi_test\"\n  }\n}"
+        },
+        "url": "{{baseUrl}}/tp/payment/adapter/v1/payout/transaction"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.variables.set('request_id', pm.variables.replaceIn('{{$guid}}'));",
+              "pm.variables.set('transaction_id', pm.variables.replaceIn('{{$guid}}'));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('code es DUPLICATE_TRANSACTION', () => pm.expect(json.code).to.eql('DUPLICATE_TRANSACTION'));",
+              "pm.test('status es FAILED', () => pm.expect(json.status).to.eql('FAILED'));",
+              "pm.test('message indica clave de idempotencia duplicada', () => {",
+              "  pm.expect(json.message).to.include('Duplicate transaction detected');",
+              "  pm.expect(json.message).to.include(pm.environment.get('payout_idem_key'));",
+              "});"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

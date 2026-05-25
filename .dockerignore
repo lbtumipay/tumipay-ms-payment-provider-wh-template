@@ -1,0 +1,39 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# IDE
+.idea
+.vscode
+*.iml
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Maven
+target
+.m2
+
+# Build artifacts
+*.class
+*.log
+
+# Environment
+.env
+.env.local
+
+# Documentation
+docs
+README.md
+CHANGELOG.md
+LICENSE
+
+# Project files
+.editorconfig
+
+# Node modules (if any)
+node_modules
+npm-debug.log
+

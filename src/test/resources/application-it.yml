@@ -1,0 +1,56 @@
+spring:
+    r2dbc:
+        url: r2dbc:h2:mem:///tpitdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+        username: sa
+        password:
+    flyway:
+        enabled: true
+        url: jdbc:h2:mem:tpitdb;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+        schemas: PUBLIC
+        default-schema: PUBLIC
+        locations: classpath:db/migration-h2
+
+tumipay:
+    authorization-refresh:
+        enabled: false
+    webhook-dispatcher:
+        enabled: false
+        worker-id: it-worker
+        batch-size: 5
+        max-retry-count: 3
+        concurrency: 2
+        retry-backoff-seconds: 5
+        worker-timeout-minutes: 1
+        validating-timeout-minutes: 1
+    webhook-receiver:
+        enabled: false
+        batch-size: 5
+    security:
+        internal:
+            api-key: test-internal-api-key
+    payment-gateway:
+        base-url: http://localhost:18080
+        api-key: test-gateway-api-key
+        timeout: 1000
+        endpoints:
+            webhook-event-path: /v1/webhook/payment-event
+    payment-provider:
+        code: TUMIPAY_EXAMPLE_PAYMENT_PROVIDER
+        name: TumiPay Example Payment Provider
+        timeout: 1000
+        payout-source-account-id: acc_it_001
+        security:
+            base-url: http://localhost:18081
+            user-id: test-user
+            secret: test-secret
+            endpoints:
+                generate-token-path: /oauth/token
+                refresh-token-path: /oauth/refresh
+        integration:
+            base-url: http://localhost:18082
+            endpoints:
+                payin-transaction-path: /v1/payins
+                payout-transaction-path: /v1/payouts
+                get-transaction-path: /v1/transactions/{id}
+                counterparty-path: /v1/counterparties
+

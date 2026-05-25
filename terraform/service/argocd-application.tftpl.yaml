@@ -1,0 +1,51 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  annotations: {}
+  labels: {}
+  name: ${name}
+  namespace: argocd
+spec:
+  destination:
+    namespace: ${namespace}
+    name: "in-cluster"
+  project: applications
+  source:
+    repoURL: "https://github.com/dixhi/tp-ppi-cobre-wh-svc.git"
+    path: "helm"
+    targetRevision: ${argocd_target_branch}
+    helm:
+      values: |
+        replicaCount: ${hpa_min_replicas}
+        environment: ${environment}
+        awsSecretName: ${secrets_name}
+
+        image:
+          repository: ${ecr_repository_url}
+          tag: "${ecr_tag}"
+          pullPolicy: IfNotPresent
+
+        name: ${name}
+        port: ${port}
+        domain: ${domain}
+        wafArn: ${waf_arn}
+        logsBucket: ${logs_bucket}
+
+        resources:
+          requests:
+            cpu: ${container_cpu_request}
+            memory: ${container_memory_request}
+          limits:
+            cpu: ${container_cpu_limit}
+            memory: ${container_memory_limit}
+        
+        hpa:
+          minReplicas: ${hpa_min_replicas}
+          maxReplicas: ${hpa_max_replicas}
+          targetCPUUtilization: ${hpa_target_cpu_utilization}
+          targetMemoryUtilization: ${hpa_target_memory_utilization}
+          scaleDownStabilizationSeconds: ${hpa_scale_down_stabilization_seconds}  
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

@@ -1,0 +1,123 @@
+[
+    {
+        "transaction": {
+            "transaction_id": "txn-perf-001",
+            "reference_id": "ref-perf-001",
+            "amount": {
+                "value": 10000,
+                "currency": "COP"
+            },
+            "country": "CO",
+            "payment_method": "CARD",
+            "description": "K6 Performance Test - PayIn 01",
+            "expiration_minutes": 30
+        },
+        "customer": {
+            "customer_id": "cust-perf-001",
+            "document": {
+                "document_type": "CC",
+                "document_number": "123456789"
+            },
+            "first_name": "Juan",
+            "last_name": "Perez",
+            "email": "juan.perez@test.com",
+            "phone": "3001234567",
+            "person_type": "INDIVIDUAL"
+        },
+        "merchant": {
+            "merchant_id": "m-perf-001",
+            "code": "TUMIPAY",
+            "name": "TumiPay Store",
+            "document": {
+                "document_type": "NIT",
+                "document_number": "900123456"
+            }
+        },
+        "webhook_url": "https://example.com/webhook/payin",
+        "metadata": {
+            "test_run": "k6-performance",
+            "order_id": "ORD-PERF-001"
+        }
+    },
+    {
+        "transaction": {
+            "transaction_id": "txn-perf-002",
+            "reference_id": "ref-perf-002",
+            "amount": {
+                "value": 50000,
+                "currency": "COP"
+            },
+            "country": "CO",
+            "payment_method": "PSE",
+            "description": "K6 Performance Test - PayIn 02",
+            "expiration_minutes": 60
+        },
+        "customer": {
+            "customer_id": "cust-perf-002",
+            "document": {
+                "document_type": "CE",
+                "document_number": "987654321"
+            },
+            "first_name": "Maria",
+            "last_name": "Lopez",
+            "email": "maria.lopez@test.com",
+            "phone": "3109876543",
+            "person_type": "INDIVIDUAL"
+        },
+        "merchant": {
+            "merchant_id": "m-perf-002",
+            "code": "TUMIPAY",
+            "name": "TumiPay Store",
+            "document": {
+                "document_type": "NIT",
+                "document_number": "900123456"
+            }
+        },
+        "webhook_url": "https://example.com/webhook/payin",
+        "metadata": {
+            "test_run": "k6-performance",
+            "order_id": "ORD-PERF-002"
+        }
+    },
+    {
+        "transaction": {
+            "transaction_id": "txn-perf-003",
+            "reference_id": "ref-perf-003",
+            "amount": {
+                "value": 150000,
+                "currency": "COP"
+            },
+            "country": "CO",
+            "payment_method": "CASH",
+            "description": "K6 Performance Test - PayIn 03",
+            "expiration_minutes": 120
+        },
+        "customer": {
+            "customer_id": "cust-perf-003",
+            "document": {
+                "document_type": "CC",
+                "document_number": "111222333"
+            },
+            "first_name": "Carlos",
+            "last_name": "Garcia",
+            "email": "carlos.garcia@test.com",
+            "phone": "3201112222",
+            "person_type": "COMPANY"
+        },
+        "merchant": {
+            "merchant_id": "m-perf-003",
+            "code": "TUMIPAY",
+            "name": "TumiPay Store",
+            "document": {
+                "document_type": "NIT",
+                "document_number": "900123456"
+            }
+        },
+        "webhook_url": "https://example.com/webhook/payin",
+        "metadata": {
+            "test_run": "k6-performance",
+            "order_id": "ORD-PERF-003"
+        }
+    }
+]
+

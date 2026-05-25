@@ -1,0 +1,29 @@
+replicaCount: "<SET_BY_ARGO_CD>"
+environment: "<SET_BY_ARGO_CD>"
+awsSecretName: "<SET_BY_ARGO_CD>"
+
+image:
+  repository: "<SET_BY_ARGO_CD>"
+  tag: "<SET_BY_ARGO_CD>"
+  pullPolicy: IfNotPresent
+
+name: "<SET_BY_ARGO_CD>"
+port: "<SET_BY_ARGO_CD>"
+domain: "<SET_BY_ARGO_CD>"
+wafArn: "<SET_BY_ARGO_CD>"
+logsBucket: "<SET_BY_ARGO_CD>"
+
+resources:
+  requests:
+    cpu: "<SET_BY_ARGO_CD>"
+    memory: "<SET_BY_ARGO_CD>"
+  limits:
+    cpu: "<SET_BY_ARGO_CD>"
+    memory: "<SET_BY_ARGO_CD>"
+
+hpa:
+  minReplicas: "<SET_BY_ARGO_CD>"
+  maxReplicas: "<SET_BY_ARGO_CD>"
+  targetCPUUtilization: "<SET_BY_ARGO_CD>"
+  targetMemoryUtilization: "<SET_BY_ARGO_CD>"
+  scaleDownStabilizationSeconds: "<SET_BY_ARGO_CD>"

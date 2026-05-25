@@ -1,0 +1,6 @@
+logging:
+    level:
+        com.tumipay.microservice: ${ENV_MS_LOG_LEVEL:INFO}
+        org.springframework.r2dbc: ${ENV_MS_LOG_R2DBC_LEVEL:WARN}
+        org.springframework.boot.autoconfigure: ${ENV_MS_LOG_AUTO_CONFIG_LEVEL:INFO}
+        org.flywaydb: ${ENV_MS_LOG_FLYWAY_LEVEL:INFO}

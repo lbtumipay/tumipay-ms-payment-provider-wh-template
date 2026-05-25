@@ -1,0 +1,107 @@
+# Embedded Server configuration
+server:
+    port: ${ENV_MS_SERVER_PORT:8000}
+    compression:
+        enabled: true
+        min-response-size: 1KB
+
+spring:
+    webflux:
+        base-path: ${ENV_MS_CONTEXT_PATH:/}
+    application:
+        name: @project.artifactId@
+        version: @project.version@
+        log: ${ENV_MS_LOG_ROOT:/logs}
+    version: 4.0.2
+    main:
+        lazy-initialization: false
+    r2dbc:
+        url: ${ENV_MS_DATABASE_R2DBC_URL:}
+        username: ${ENV_MS_DATABASE_USERNAME:}
+        password: ${ENV_MS_DATABASE_PASSWORD:}
+        pool:
+            enabled: true
+            initial-size: ${ENV_MS_DATABASE_POOL_SIZE:10}
+            max-size: ${ENV_MS_DATABASE_POOL_MAX_SIZE:20}
+            max-idle-time: 30m
+    flyway:
+        url: ${ENV_MS_DATABASE_JDBC_URL:}
+        enabled: ${ENV_MS_FLYWAY_ENABLED:true}
+        baseline-on-migrate: true
+        create-schemas: true
+        schemas: ${ENV_DB_SCHEMA:}
+        default-schema: ${ENV_DB_SCHEMA:}
+        locations: classpath:db/migration
+
+logging:
+    level:
+        com.tumipay.microservice: ${ENV_MS_LOG_LEVEL:INFO}
+        org.springframework.r2dbc: ${ENV_MS_LOG_R2DBC_LEVEL:INFO}
+        org.springframework.boot.autoconfigure: ${ENV_MS_LOG_AUTO_CONFIG_LEVEL:INFO}
+        org.flywaydb: ${ENV_MS_LOG_FLYWAY_LEVEL:INFO}
+
+webclient:
+    pool:
+        max-connections: ${ENV_MS_HTTP_POOL_MAX_CONNECTIONS:100}
+        pending-acquire-timeout: ${ENV_MS_HTTP_POOL_ACQUIRE_TIMEOUT:30s}
+        max-idle-time: ${ENV_MS_HTTP_POOL_MAX_IDLE_TIME:20s}
+        max-life-time: ${ENV_MS_HTTP_POOL_MAX_LIFE_TIME:5m}
+        evict-in-background: ${ENV_MS_HTTP_POOL_EVICT_IN_BACKGROUND:30s}
+    timeout:
+        connect: 5s
+        response: 30s
+    tcp:
+        keep-alive: true
+
+tumipay:
+    security:
+        internal:
+            api-key: ${ENV_MS_INTERNAL_API_KEY}
+    microservice:
+        name: ${spring.application.name}
+        version: 1.0.0
+        environment: ${spring.profiles.active:default}
+        startup-log-enabled: true
+        startup-log-level: INFO
+        spring-version: ${spring.version:component version not available}
+        logs-path: ${spring.application.log:log path not available}
+        port: ${server.port:8000}
+        context-path: ${spring.webflux.base-path:component-server-servlet-context-path-not-available}
+        description: Payment Provider Service Webhook for COBRE
+    common-configuration:
+        amount-scale: ${ENV_PAYMENT_AMOUNT_SCALE:2}
+        amount-rounding-mode: ${ENV_PAYMENT_AMOUNT_ROUNDING_MODE:HALF_UP}
+    schedulers:
+        scheduler-webhook-dispatcher:
+            scheduler-initial-delay-ms: ${ENV_SCH_WH_WORKER_INITIAL_DELAY_MS:15000}
+            scheduler-fixed-delay-ms: ${ENV_SCH_WH_WORKER_FIXED_DELAY_MS:30000}
+        scheduler-webhook-receiver:
+            scheduler-initial-delay-ms: ${ENV_SCH_WH_RECEIVER_INITIAL_DELAY_MS:5000}
+            scheduler-fixed-delay-ms: ${ENV_SCH_WH_RECEIVER_FIXED_DELAY_MS:15000}
+    payment-provider:
+        code: ${ENV_PAYMENT_PROVIDER_CODE:}
+        name: ${ENV_PAYMENT_PROVIDER_NAME:}
+    webhook-signature:
+        enabled: true
+        tolerance-seconds: 300
+        signature-header: ${ENV_WH_SIGNATURE_HEADER_SIGNATURE:event-signature}
+        timestamp-header: ${ENV_WH_SIGNATURE_HEADER_TIMESTAMP:event-timestamp}
+        secret: ${ENV_WH_SIGNATURE_KEY:}
+    webhook-dispatcher:
+        enabled: ${ENV_WH_DISPATCHER_ENABLED:true}
+        worker-id: ${ENV_WH_DISPATCHER_ID}
+        batch-size: ${ENV_WH_DISPATCHER_BATCH_SIZE:10}
+        max-retry-count: ${ENV_WH_DISPATCHER_MAX_RETRY_COUNT:5}
+        concurrency: ${ENV_WH_DISPATCHER_CONCURRENCY:10}
+        retry-backoff-seconds: ${ENV_WH_DISPATCHER_RETRY_BACKOFF_SECONDS:30}
+        worker-timeout-minutes: ${ENV_WH_DISPATCHER_TIMEOUT_MINUTES:5}
+        validating-timeout-minutes: ${ENV_WH_DISPATCHER_VALIDATING_TIMEOUT_MINUTES:60}
+    webhook-receiver:
+        enabled: ${ENV_WH_RECEIVER_ENABLED:true}
+        batch-size: ${ENV_WH_RECEIVER_BATCH_SIZE:20}
+    payment-gateway:
+        base-url: ${ENV_PAYMENT_GATEWAY_BASE_URL}
+        api-key: ${ENV_PAYMENT_GATEWAY_API_KEY}
+        timeout: ${ENV_PAYMENT_GATEWAY_TIME_OUT:9000}
+        endpoints:
+            webhook-event-path: ${ENV_PAYMENT_GATEWAY_WEBHOOK_PATH}

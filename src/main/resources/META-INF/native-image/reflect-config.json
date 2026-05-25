@@ -1,0 +1,214 @@
+[
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.input.http.standard.dto.AmountDto",
+        "comment": "Inbound HTTP DTO representing monetary amount data used in standard transaction requests",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.input.http.standard.dto.BankAccountDto",
+        "comment": "Inbound HTTP DTO representing bank account information used in standard transaction requests",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.input.http.standard.dto.BeneficiaryDto",
+        "comment": "Inbound HTTP DTO representing beneficiary information used in standard transaction requests",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.input.http.standard.dto.CustomerDto",
+        "comment": "Inbound HTTP DTO representing customer information used in standard transaction requests",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.input.http.standard.dto.DocumentDto",
+        "comment": "Inbound HTTP DTO representing customer document information used in standard transaction requests",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.input.http.standard.dto.MerchantDto",
+        "comment": "Inbound HTTP DTO representing merchant information used in standard transaction requests",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.input.http.standard.dto.TransactionDto",
+        "comment": "Inbound HTTP DTO representing transaction payload used in standard payment requests",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.domain.model.authorization.CredentialMetadata",
+        "comment": "Credential metadata used for caching and serialization of provider authentication data",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.domain.model.authorization.AuthCredential",
+        "comment": "Authentication credential model (token/api key) stored in cache and serialized/deserialized at runtime",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true
+    },
+    {
+        "name": "com.tumipay.microservice.domain.model.payin.PayInTransaction",
+        "comment": "Domain entity representing a PayIn transaction, used in persistence and serialization processes",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.domain.model.payin.PayInTransactionResult",
+        "comment": "Generic PayIn transaction result containing dynamic providerRequest/providerResponse payloads, requires reflection for JSON serialization in GraalVM",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.domain.model.payout.PayOutTransaction",
+        "comment": "Domain entity representing a PayOut transaction, used in persistence and integration flows",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.domain.model.payout.PayOutTransactionResult",
+        "comment": "Generic PayOut transaction result with dynamic payloads, requires reflection for proper serialization in GraalVM",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.domain.model.provider.ProviderIntegrationLog",
+        "comment": "Persistence entity used to store provider request/response payloads in JSON format for auditing and traceability",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.domain.model.provider.ProviderTransaction",
+        "comment": "Normalized provider transaction entity used for internal processing and storage",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.domain.model.transaction.AdapterTransactionResult",
+        "comment": "Standard adapter transaction result that encapsulates provider response data and is used in mapping and serialization",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.output.http.provider.request.ProviderCredentialRequest",
+        "comment": "Outbound HTTP request DTO sent to the provider, serialized as JSON for integration and persistence purposes",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.output.http.provider.request.ProviderPayInRequest",
+        "comment": "Outbound HTTP request DTO sent to the provider, serialized as JSON for integration and persistence purposes",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.output.http.provider.request.ProviderPayOutRequest",
+        "comment": "Outbound HTTP request DTO sent to the provider, serialized as JSON for integration and persistence purposes",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.output.http.provider.request.ProviderTransactionRequest",
+        "comment": "Outbound HTTP request DTO sent to the provider, serialized as JSON for integration and persistence purposes",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.output.http.provider.response.ProviderCredentialResponse",
+        "comment": "Outbound HTTP request DTO sent to the provider, serialized as JSON for integration and persistence purposes",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.output.http.provider.response.ProviderPayInResponse",
+        "comment": "Outbound HTTP request DTO sent to the provider, serialized as JSON for integration and persistence purposes",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.output.http.provider.response.ProviderPayOutResponse",
+        "comment": "Outbound HTTP request DTO sent to the provider, serialized as JSON for integration and persistence purposes",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.output.http.provider.response.ProviderTransactionStatusResponse",
+        "comment": "Outbound HTTP request DTO sent to the provider, serialized as JSON for integration and persistence purposes",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.output.http.provider.response.ProviderTransactionDetailResponse",
+        "comment": "Outbound HTTP request DTO sent to the provider, serialized as JSON for integration and persistence purposes",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.output.http.provider.response.ProviderTransactionResponse",
+        "comment": "Outbound HTTP request DTO sent to the provider, serialized as JSON for integration and persistence purposes",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "java.time.Instant",
+        "comment": "Java time type used across domain models, requires reflection support for serialization in GraalVM",
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "java.time.Duration",
+        "comment": "Java time type used for latency and TTL calculations, requires reflection support in GraalVM",
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.output.http.standard.response.GatewayWebhookResponse",
+        "comment": "Gateway webhook response DTO used by WebClient (Jackson) for deserialization in GraalVM",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.output.http.standard.response.GatewayWebhookResponse$GatewayWebhookResponseData",
+        "comment": "Nested DTO inside GatewayWebhookResponse for successful responses, requires reflection for Jackson mapping",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.infrastructure.adapter.output.http.standard.request.GatewayWebhookRequest",
+        "comment": "Outbound webhook request DTO serialized to JSON using Jackson inside WebClient",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    }
+]

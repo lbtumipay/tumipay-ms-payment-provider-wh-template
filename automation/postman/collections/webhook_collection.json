@@ -1,0 +1,157 @@
+{
+  "info": {
+    "name": "TumiPay - Webhook Tests",
+    "_postman_id": "67547926-f2cc-4789-981e-01fac89741ae",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01_valid_event",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Api-Key",
+            "value": "{{apiKey}}"
+          },
+          {
+            "key": "X-Idempotency-Key",
+            "value": "{{idempotency_key}}"
+          },
+          {
+            "key": "X-Provider-Event-Id",
+            "value": "{{providerEventId}}"
+          },
+          {
+            "key": "X-Provider-Event-Type",
+            "value": "{{providerEventType}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"provider_event_id\": \"{{providerEventId}}\",\n  \"provider_event_type\": \"TRANSACTION_STATUS_UPDATE\",\n  \"provider_transaction_id\": \"{{provider_transaction_id}}\",\n  \"provider_status\": \"SUCCESS\",\n  \"provider_data\": {\n    \"example\": \"ok\"\n  }\n}"
+        },
+        "url": "{{baseUrl}}/tp/payment/adapter/v1/webhook/event"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.variables.set('idempotency_key', pm.variables.replaceIn('{{$guid}}'));",
+              "pm.variables.set('providerEventId', pm.variables.replaceIn('{{$guid}}'));",
+              "pm.variables.set('providerEventType', 'TRANSACTION_STATUS_UPDATE');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('Accepted or OK', () => pm.expect([200,202,409]).to.include(pm.response.code));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02_invalid_event_missing_fields",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Api-Key",
+            "value": "{{apiKey}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{}"
+        },
+        "url": "{{baseUrl}}/tp/payment/adapter/v1/webhook/event"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('Code expected for invalid payload', () => pm.expect(['VALIDATION_ERROR','PROCESSED']).to.include(json.code));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03_idempotency_duplicate",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Api-Key",
+            "value": "{{apiKey}}"
+          },
+          {
+            "key": "X-Idempotency-Key",
+            "value": "{{fixed_idempotency}}"
+          },
+          {
+            "key": "X-Provider-Event-Id",
+            "value": "{{providerEventId}}"
+          },
+          {
+            "key": "X-Provider-Event-Type",
+            "value": "{{providerEventType}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"provider_event_id\": \"evt-dup\",\n  \"provider_event_type\": \"TRANSACTION_STATUS_UPDATE\",\n  \"provider_transaction_id\": \"{{provider_transaction_id}}\",\n  \"provider_status\": \"SUCCESS\",\n  \"provider_data\": {\n    \"example\": \"dup\"\n  }\n}"
+        },
+        "url": "{{baseUrl}}/tp/payment/adapter/v1/webhook/event"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.environment.set('fixed_idempotency', 'idem-webhook-123');",
+              "pm.variables.set('providerEventId', 'evt-dup');",
+              "pm.variables.set('providerEventType', 'TRANSACTION_STATUS_UPDATE');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "if (json.code === 'DUPLICATE_TRANSACTION') {",
+              "  pm.test('Duplicate detected', () => pm.expect(json.status).to.eql('FAILED'));",
+              "} else {",
+              "  pm.test('First call OK', () => pm.expect([200,202,409]).to.include(pm.response.code));",
+              "}"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,150 @@
+{
+  "info": {
+    "name": "TumiPay - Query Tests",
+    "_postman_id": "8e6f0d23-dd64-455b-ba15-fe4d2d9fd280",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01_by_transaction_id",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Request-ID",
+            "value": "{{request_id}}"
+          },
+          {
+            "key": "X-Api-Key",
+            "value": "{{apiKey}}"
+          },
+          {
+            "key": "X-Gateway-Version",
+            "value": "v1"
+          }
+        ],
+        "url": "{{baseUrl}}/tp/payment/adapter/v1/transactions?transaction_id={{transaction_id}}"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.variables.set('request_id', pm.variables.replaceIn('{{$guid}}'));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('SUCCESS', () => pm.expect(json.status).to.eql('SUCCESS'));",
+              "pm.test('Match transaction_id', () => pm.expect(json.data.transaction_id).to.eql(pm.environment.get('transaction_id')));"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "02_by_adapter_transaction_id",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Request-ID",
+            "value": "{{request_id}}"
+          },
+          {
+            "key": "X-Api-Key",
+            "value": "{{apiKey}}"
+          },
+          {
+            "key": "X-Gateway-Version",
+            "value": "v1"
+          }
+        ],
+        "url": "{{baseUrl}}/tp/payment/adapter/v1/transactions?adapter_transaction_id={{adapter_transaction_id}}"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.variables.set('request_id', pm.variables.replaceIn('{{$guid}}'));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('SUCCESS', () => pm.expect(json.status).to.eql('SUCCESS'));",
+              "pm.test('Adapter id exists', () => pm.expect(json.data.adapter_transaction_id).to.exist);"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "03_by_provider_transaction_id",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          },
+          {
+            "key": "X-Request-ID",
+            "value": "{{request_id}}"
+          },
+          {
+            "key": "X-Api-Key",
+            "value": "{{apiKey}}"
+          },
+          {
+            "key": "X-Gateway-Version",
+            "value": "v1"
+          }
+        ],
+        "url": "{{baseUrl}}/tp/payment/adapter/v1/transactions?provider_transaction_id={{provider_transaction_id}}"
+      },
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.variables.set('request_id', pm.variables.replaceIn('{{$guid}}'));"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const json = pm.response.json();",
+              "pm.test('SUCCESS', () => pm.expect(json.status).to.eql('SUCCESS'));",
+              "pm.test('Provider id exists', () => pm.expect(json.data.provider_transaction_id).to.exist);"
+            ]
+          }
+        }
+      ]
+    }
+  ]
+}

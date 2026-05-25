@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN" monitorInterval="30">
+
+    <Properties>
+        <Property name="LOG_MS_NAME">${env:ENV_MS_FILE_NAME:-tp-ppi-cobre-wh-svc}</Property>
+
+        <Property name="LOG_PATTERN_CONSOLE">
+            %d|%X{requestId}|%X{merchantId}|%t|%p|${LOG_MS_NAME}|%X{operationId}|%c{1} #%L: %m%n
+        </Property>
+    </Properties>
+
+    <Appenders>
+
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN_CONSOLE}"/>
+        </Console>
+
+    </Appenders>
+
+    <Loggers>
+
+        <Root level="INFO">
+            <AppenderRef ref="console"/>
+        </Root>
+
+    </Loggers>
+
+</Configuration>
