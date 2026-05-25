@@ -6,6 +6,7 @@ import com.tumipay.microservice.infrastructure.adapter.input.http.provider.reque
 import com.tumipay.microservice.infrastructure.adapter.input.http.provider.response.ProviderWebhookResponse;
 import com.tumipay.microservice.infrastructure.component.annotation.ProviderWebhookSigned;
 import com.tumipay.microservice.infrastructure.component.util.ReactiveControllerUtils;
+import com.tumipay.microservice.shared.enums.BaseErrorCodeEnum;
 import com.tumipay.microservice.shared.exception.BusinessException;
 import com.tumipay.microservice.shared.properties.PaymentProvidersProperties;
 import lombok.RequiredArgsConstructor;
@@ -73,7 +74,7 @@ public class ProviderWebhookController {
             return Mono.just(
                 ResponseEntity.status(HttpStatus.CONFLICT)
                     .body(ProviderWebhookResponse.builder()
-                        .code("DUPLICATE_WEBHOOK_EVENT")
+                        .code(BaseErrorCodeEnum.DUPLICATE_WEBHOOK_EVENT.getCode())
                         .message("Message with the same idempotency key already received and processed")
                         .build()
                     )
