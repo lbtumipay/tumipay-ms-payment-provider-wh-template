@@ -27,10 +27,13 @@ import reactor.test.StepVerifier;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -113,8 +116,7 @@ class ReactiveHttpClientExecutorTest {
 
         StepVerifier.create(executor.execute(request, String.class))
             .expectErrorSatisfies(throwable -> {
-                assertTrue(throwable instanceof BusinessException);
-                BusinessException exception = (BusinessException) throwable;
+                BusinessException exception = assertInstanceOf(BusinessException.class, throwable);
                 assertEquals(BaseErrorCodeEnum.HTTP_INTEGRATION_ERROR.getCode(), exception.getCode());
                 assertTrue(exception.getMessage().contains("Unsupported HTTP method"));
             })
@@ -133,8 +135,7 @@ class ReactiveHttpClientExecutorTest {
 
         StepVerifier.create(executor.execute(request, String.class))
             .expectErrorSatisfies(throwable -> {
-                assertTrue(throwable instanceof BusinessException);
-                BusinessException exception = (BusinessException) throwable;
+                BusinessException exception = assertInstanceOf(BusinessException.class, throwable);
                 assertEquals(BaseErrorCodeEnum.RESOURCE_NOT_FOUND.getCode(), exception.getCode());
             })
             .verify();
@@ -152,8 +153,7 @@ class ReactiveHttpClientExecutorTest {
 
         StepVerifier.create(executor.execute(request, String.class))
             .expectErrorSatisfies(throwable -> {
-                assertTrue(throwable instanceof BusinessException);
-                BusinessException exception = (BusinessException) throwable;
+                BusinessException exception = assertInstanceOf(BusinessException.class, throwable);
                 assertEquals(BaseErrorCodeEnum.RESOURCE_NOT_FOUND.getCode(), exception.getCode());
             })
             .verify();
@@ -172,6 +172,28 @@ class ReactiveHttpClientExecutorTest {
         StepVerifier.create(executor.execute(request, String.class))
             .expectError(TimeoutException.class)
             .verify(Duration.ofSeconds(2));
+    }
+
+    @Test
+    @DisplayName("execute - should return accepted error response when status is configured")
+    void execute_shouldReturnAcceptedErrorResponseWhenStatusIsConfigured() {
+        WebClient webClient = WebClient.builder()
+            .exchangeFunction(request -> Mono.just(ClientResponse.create(HttpStatus.CONFLICT).build()))
+            .build();
+
+        ReactiveHttpClientExecutor executor = new ReactiveHttpClientExecutor(new StubWebClientFactory(webClient));
+        ClientHttpRequest<Map<String, Object>> request = buildRequest(HttpMethodEnum.POST, Duration.ofMillis(150));
+        request.setAcceptedStatusCodes(Set.of(HttpStatus.CONFLICT.value()));
+
+        StepVerifier.create(executor.execute(request, String.class))
+            .assertNext(response -> {
+                assertEquals(HttpStatus.CONFLICT.value(), response.getStatusCode());
+                assertEquals("", response.getRawBody());
+                assertFalse(response.getSuccess());
+                assertEquals("req-123", response.getRequestId());
+                assertEquals("integration-run-1", response.getIntegrationId());
+            })
+            .verifyComplete();
     }
 
     private ClientHttpRequest<Map<String, Object>> buildRequest(HttpMethodEnum method, Duration timeout) {

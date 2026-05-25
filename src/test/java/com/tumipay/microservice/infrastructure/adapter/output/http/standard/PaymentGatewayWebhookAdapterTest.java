@@ -3,26 +3,29 @@ package com.tumipay.microservice.infrastructure.adapter.output.http.standard;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tumipay.microservice.domain.model.webhook.WebhookEvent;
 import com.tumipay.microservice.infrastructure.adapter.output.http.standard.response.GatewayWebhookResponse;
+import com.tumipay.microservice.infrastructure.component.constant.BaseIntegrationConstant;
+import com.tumipay.microservice.infrastructure.component.http.dto.ClientHttpRequest;
+import com.tumipay.microservice.infrastructure.component.http.dto.ClientHttpResponse;
+import com.tumipay.microservice.infrastructure.component.http.contract.IHttpClientExecutor;
 import com.tumipay.microservice.infrastructure.component.properties.PaymentGatewayProperties;
 import com.tumipay.microservice.shared.exception.GatewayWebhookException;
-import com.tumipay.microservice.shared.properties.WebClientProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.web.reactive.function.client.ClientResponse;
-import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Instant;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.TimeoutException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 /**
@@ -71,7 +74,7 @@ class PaymentGatewayWebhookAdapterTest {
 
 
     @Mock
-    private WebClientProperties webClientProperties;
+    private IHttpClientExecutor httpClientExecutor;
 
     private final ObjectMapper objectMapper = new ObjectMapper()
         .findAndRegisterModules();          // registers JavaTimeModule for Instant serialization
@@ -87,27 +90,21 @@ class PaymentGatewayWebhookAdapterTest {
         when(paymentGatewayProperties.getEndpoints()).thenReturn(gatewayEndpoints);
         when(gatewayEndpoints.getWebhookEventPath()).thenReturn(WEBHOOK_PATH);
         when(paymentGatewayProperties.getTimeout()).thenReturn(5_000);
+
+        adapter = new PaymentGatewayWebhookAdapter(
+            paymentGatewayProperties,
+            httpClientExecutor
+        );
     }
 
-    /**
-     * Builds the adapter wiring a {@code WebClient} backed by a stub {@code ExchangeFunction}
-     * that returns the given {@code responseBody} and HTTP {@code status}.
-     */
-    private PaymentGatewayWebhookAdapter adapterWith(String responseBody, HttpStatus status) {
-        final WebClient stubWebClient = WebClient.builder()
-            .exchangeFunction(request -> Mono.just(
-                ClientResponse.create(status)
-                    .header(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
-                    .body(responseBody)
-                    .build()
-            ))
-            .build();
-
-        return new PaymentGatewayWebhookAdapter(
-            paymentGatewayProperties,
-            stubWebClient,
-            webClientProperties
-        );
+    private void stubExecutorWith(String responseBody, HttpStatus status) {
+        when(httpClientExecutor.execute(any(), eq(String.class)))
+            .thenReturn(Mono.just(ClientHttpResponse.<String>builder()
+                .statusCode(status.value())
+                .body(responseBody)
+                .rawBody(responseBody)
+                .success(status.is2xxSuccessful())
+                .build()));
     }
 
     private WebhookEvent buildWebhookEvent() {
@@ -136,7 +133,7 @@ class PaymentGatewayWebhookAdapterTest {
                 .build())
             .build();
 
-        adapter = adapterWith(objectMapper.writeValueAsString(payload), HttpStatus.OK);
+        stubExecutorWith(objectMapper.writeValueAsString(payload), HttpStatus.OK);
 
         StepVerifier.create(adapter.dispatchWebhookEvent(buildWebhookEvent()))
             .assertNext(response -> {
@@ -160,7 +157,7 @@ class PaymentGatewayWebhookAdapterTest {
                 .build())
             .build();
 
-        adapter = adapterWith(objectMapper.writeValueAsString(payload), HttpStatus.OK);
+        stubExecutorWith(objectMapper.writeValueAsString(payload), HttpStatus.OK);
 
         StepVerifier.create(adapter.dispatchWebhookEvent(buildWebhookEvent()))
             .assertNext(response -> {
@@ -182,7 +179,7 @@ class PaymentGatewayWebhookAdapterTest {
             .message("Operation accepted")
             .build();
 
-        adapter = adapterWith(objectMapper.writeValueAsString(payload), HttpStatus.ACCEPTED);
+        stubExecutorWith(objectMapper.writeValueAsString(payload), HttpStatus.ACCEPTED);
 
         StepVerifier.create(adapter.dispatchWebhookEvent(buildWebhookEvent()))
             .assertNext(response -> {
@@ -203,7 +200,7 @@ class PaymentGatewayWebhookAdapterTest {
             .message("Duplicate event detected for idempotency_key " + IDEMPOTENCY_KEY)
             .build();
 
-        adapter = adapterWith(objectMapper.writeValueAsString(payload), HttpStatus.CONFLICT);
+        stubExecutorWith(objectMapper.writeValueAsString(payload), HttpStatus.CONFLICT);
 
         StepVerifier.create(adapter.dispatchWebhookEvent(buildWebhookEvent()))
             .assertNext(response -> {
@@ -217,7 +214,7 @@ class PaymentGatewayWebhookAdapterTest {
     @Test
     @DisplayName("HTTP 409 with empty body — synthetic response should have DUPLICATE_EVENT code")
     void dispatchWebhookEvent_http409EmptyBody_syntheticResponseHasDuplicateEventCode() {
-        adapter = adapterWith("", HttpStatus.CONFLICT);
+        stubExecutorWith("", HttpStatus.CONFLICT);
 
         StepVerifier.create(adapter.dispatchWebhookEvent(buildWebhookEvent()))
             .assertNext(response -> {
@@ -234,7 +231,7 @@ class PaymentGatewayWebhookAdapterTest {
     @Test
     @DisplayName("HTTP 400 — should throw GatewayWebhookException with GATEWAY_CLIENT_ERROR_400 code")
     void dispatchWebhookEvent_http400_throwsGatewayClientError() {
-        adapter = adapterWith("{\"code\":\"VALIDATION_ERROR\",\"status\":\"ERROR\"}", HttpStatus.BAD_REQUEST);
+        stubExecutorWith("{\"code\":\"VALIDATION_ERROR\",\"status\":\"ERROR\"}", HttpStatus.BAD_REQUEST);
 
         StepVerifier.create(adapter.dispatchWebhookEvent(buildWebhookEvent()))
             .expectErrorSatisfies(error -> {
@@ -247,7 +244,7 @@ class PaymentGatewayWebhookAdapterTest {
     @Test
     @DisplayName("HTTP 401 — should throw GatewayWebhookException with GATEWAY_CLIENT_ERROR_401 code")
     void dispatchWebhookEvent_http401_throwsGatewayClientError() {
-        adapter = adapterWith("{\"code\":\"UNAUTHORIZED\",\"status\":\"ERROR\"}", HttpStatus.UNAUTHORIZED);
+        stubExecutorWith("{\"code\":\"UNAUTHORIZED\",\"status\":\"ERROR\"}", HttpStatus.UNAUTHORIZED);
 
         StepVerifier.create(adapter.dispatchWebhookEvent(buildWebhookEvent()))
             .expectErrorSatisfies(error -> {
@@ -260,7 +257,7 @@ class PaymentGatewayWebhookAdapterTest {
     @Test
     @DisplayName("HTTP 500 — should throw GatewayWebhookException with GATEWAY_SERVER_ERROR_500 code")
     void dispatchWebhookEvent_http500_throwsGatewayServerError() {
-        adapter = adapterWith("{\"code\":\"INTERNAL_ERROR\",\"status\":\"ERROR\"}", HttpStatus.INTERNAL_SERVER_ERROR);
+        stubExecutorWith("{\"code\":\"INTERNAL_ERROR\",\"status\":\"ERROR\"}", HttpStatus.INTERNAL_SERVER_ERROR);
 
         StepVerifier.create(adapter.dispatchWebhookEvent(buildWebhookEvent()))
             .expectErrorSatisfies(error -> {
@@ -273,7 +270,7 @@ class PaymentGatewayWebhookAdapterTest {
     @Test
     @DisplayName("HTTP 503 — should throw GatewayWebhookException with GATEWAY_SERVER_ERROR_503 code")
     void dispatchWebhookEvent_http503_throwsGatewayServerError() {
-        adapter = adapterWith("{\"code\":\"SERVICE_UNAVAILABLE\",\"status\":\"ERROR\"}", HttpStatus.SERVICE_UNAVAILABLE);
+        stubExecutorWith("{\"code\":\"SERVICE_UNAVAILABLE\",\"status\":\"ERROR\"}", HttpStatus.SERVICE_UNAVAILABLE);
 
         StepVerifier.create(adapter.dispatchWebhookEvent(buildWebhookEvent()))
             .expectErrorSatisfies(error -> {
@@ -281,6 +278,56 @@ class PaymentGatewayWebhookAdapterTest {
                 assertEquals("GATEWAY_SERVER_ERROR_503", ((GatewayWebhookException) error).getCode());
             })
             .verify();
+    }
+
+    @Test
+    @DisplayName("Timeout del executor — debe mapearse a GatewayWebhookException con GATEWAY_TIMEOUT")
+    void dispatchWebhookEvent_timeout_throwsGatewayTimeout() {
+        when(httpClientExecutor.execute(any(), eq(String.class)))
+            .thenReturn(Mono.error(new TimeoutException("simulated timeout")));
+
+        StepVerifier.create(adapter.dispatchWebhookEvent(buildWebhookEvent()))
+            .expectErrorSatisfies(error -> {
+                assertInstanceOf(GatewayWebhookException.class, error);
+                assertEquals("GATEWAY_TIMEOUT", ((GatewayWebhookException) error).getCode());
+            })
+            .verify();
+    }
+
+    @Test
+    @DisplayName("Debe construir la solicitud del executor con host, path, timeout y headers esperados")
+    void dispatchWebhookEvent_buildsExecutorRequestCorrectly() {
+        AtomicReference<ClientHttpRequest<?>> capturedRequestRef = new AtomicReference<>();
+        when(httpClientExecutor.execute(any(), eq(String.class)))
+            .thenAnswer(invocation -> {
+                capturedRequestRef.set(invocation.getArgument(0));
+                return Mono.just(ClientHttpResponse.<String>builder()
+                    .statusCode(HttpStatus.OK.value())
+                    .body("{\"code\":\"PROCESS_COMPLETED\",\"status\":\"SUCCESS\",\"message\":\"ok\"}")
+                    .rawBody("{\"code\":\"PROCESS_COMPLETED\",\"status\":\"SUCCESS\",\"message\":\"ok\"}")
+                    .success(true)
+                    .build());
+            });
+
+        StepVerifier.create(adapter.dispatchWebhookEvent(buildWebhookEvent()))
+            .expectNextCount(1)
+            .verifyComplete();
+
+        ClientHttpRequest<?> capturedRequest = capturedRequestRef.get();
+        assertNotNull(capturedRequest);
+        assertNotNull(capturedRequest.getConfigIntegration());
+        assertEquals(GATEWAY_BASE_URL, capturedRequest.getConfigIntegration().getHost());
+        assertEquals(WEBHOOK_PATH, capturedRequest.getConfigIntegration().getIntegrationPath());
+        assertEquals("TUMIPAY_PAYMENT_GATEWAY_WEBHOOK", capturedRequest.getConfigIntegration().getIntegrationCode());
+        assertEquals(5_000L, capturedRequest.getConfigIntegration().getTimeout().toMillis());
+        assertEquals(IDEMPOTENCY_KEY, capturedRequest.getRequestId());
+        assertEquals(EVENT_UUID, capturedRequest.getIntegrationId());
+        assertNotNull(capturedRequest.getAcceptedStatusCodes());
+        assertTrue(capturedRequest.getAcceptedStatusCodes().contains(HttpStatus.CONFLICT.value()));
+        assertTrue(capturedRequest.getAcceptedStatusCodes().contains(HttpStatus.INTERNAL_SERVER_ERROR.value()));
+        assertEquals(IDEMPOTENCY_KEY, capturedRequest.getHeaders().getFirst(BaseIntegrationConstant.HEADER_IDEMPOTENCY_KEY));
+        assertEquals(GATEWAY_API_KEY, capturedRequest.getHeaders().getFirst(BaseIntegrationConstant.HEADER_API_KEY));
+        assertEquals(PROVIDER_CODE, capturedRequest.getHeaders().getFirst(BaseIntegrationConstant.HEADER_ADAPTER_PROVIDER_CODE));
     }
 }
 

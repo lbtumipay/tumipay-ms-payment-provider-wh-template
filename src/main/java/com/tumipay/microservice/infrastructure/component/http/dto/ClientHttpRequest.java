@@ -9,6 +9,7 @@ import org.springframework.util.MultiValueMap;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.Duration;
+import java.util.Set;
 
 /**
  * ClientHttpRequest
@@ -62,6 +63,11 @@ public class ClientHttpRequest <T> implements Serializable {
      * Request timeout.
      */
     private Duration timeout;
+
+    /**
+     * HTTP status codes that must be returned to the caller instead of being mapped as execution errors.
+     */
+    private Set<Integer> acceptedStatusCodes;
 
     /**
      * Correlation identifier.
