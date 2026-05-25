@@ -23,9 +23,9 @@ class BaseErrorCodeEnumTest {
     // ── Enum catalogue ─────────────────────────────────────────────────────────
 
     @Test
-    @DisplayName("Should contain exactly 12 declared constants")
-    void shouldContainExactlyTwelveConstants() {
-        assertEquals(12, BaseErrorCodeEnum.values().length);
+    @DisplayName("Should contain exactly 28 declared constants")
+    void shouldContainExactlyTwentyEightConstants() {
+        assertEquals(28, BaseErrorCodeEnum.values().length);
     }
 
     @Test
@@ -51,7 +51,7 @@ class BaseErrorCodeEnumTest {
         "CACHE_ERROR,            CACHE_ERROR, Cache operation failed",
         "DUPLICATE_WEBHOOK_EVENT, DUPLICATE_WEBHOOK_EVENT, A webhook event with this idempotency key has already been processed",
         "WEBHOOK_PROCESSING_ERROR, WEBHOOK_PROCESSING_ERROR, An error occurred while processing the webhook event",
-        "INTERNAL_ERROR,         999, Internal server error"
+        "INTERNAL_ERROR,         INTERNAL_ERROR, Internal server error"
     })
     void shouldExposeCorrectCodeAndMessagePerConstant(String name, String expectedCode, String expectedMessage) {
         BaseErrorCodeEnum constant = BaseErrorCodeEnum.valueOf(name.trim());
@@ -66,7 +66,7 @@ class BaseErrorCodeEnumTest {
     @DisplayName("toString should return the code value")
     void toStringShouldReturnCodeValue() {
         assertEquals("VALIDATION_ERROR", BaseErrorCodeEnum.VALIDATION_ERROR.toString());
-        assertEquals("999", BaseErrorCodeEnum.INTERNAL_ERROR.toString());
+        assertEquals("INTERNAL_ERROR", BaseErrorCodeEnum.INTERNAL_ERROR.toString());
     }
 
     // ── getResponseByCode ──────────────────────────────────────────────────────
@@ -77,7 +77,7 @@ class BaseErrorCodeEnumTest {
         assertEquals(BaseErrorCodeEnum.VALIDATION_ERROR,      BaseErrorCodeEnum.getResponseByCode("VALIDATION_ERROR"));
         assertEquals(BaseErrorCodeEnum.TRANSACTION_NOT_FOUND, BaseErrorCodeEnum.getResponseByCode("TRANSACTION_NOT_FOUND"));
         assertEquals(BaseErrorCodeEnum.WEBHOOK_PROCESSING_ERROR, BaseErrorCodeEnum.getResponseByCode("WEBHOOK_PROCESSING_ERROR"));
-        assertEquals(BaseErrorCodeEnum.INTERNAL_ERROR,        BaseErrorCodeEnum.getResponseByCode("999"));
+        assertEquals(BaseErrorCodeEnum.INTERNAL_ERROR,        BaseErrorCodeEnum.getResponseByCode("INTERNAL_ERROR"));
     }
 
     @Test
@@ -116,7 +116,7 @@ class BaseErrorCodeEnumTest {
         "CACHE_ERROR",
         "DUPLICATE_WEBHOOK_EVENT",
         "WEBHOOK_PROCESSING_ERROR",
-        "999"
+        "INTERNAL_ERROR"
     })
     void existsShouldReturnTrueForAllDeclaredCodes(String code) {
         assertTrue(BaseErrorCodeEnum.exists(code));
