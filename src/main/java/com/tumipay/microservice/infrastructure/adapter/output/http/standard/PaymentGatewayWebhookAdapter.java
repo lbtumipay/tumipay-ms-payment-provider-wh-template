@@ -85,12 +85,40 @@ public class PaymentGatewayWebhookAdapter implements IPaymentGatewayWebhookAdapt
             final long timeoutMs = resolveTimeoutMillis();
             final String path = resolveWebhookEventPath();
 
-            final ClientHttpRequest<GatewayWebhookRequest> httpRequest = buildClientHttpRequest(
-                webhookEvent,
-                request,
-                timeoutMs,
-                path
-            );
+            final HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            if (StringUtils.hasText(webhookEvent.getIdempotencyKey())) {
+                headers.add(BaseIntegrationConstant.HEADER_IDEMPOTENCY_KEY, webhookEvent.getIdempotencyKey());
+            }
+
+            if (StringUtils.hasText(paymentGatewayProperties.getApiKey())) {
+                headers.add(BaseIntegrationConstant.HEADER_API_KEY, paymentGatewayProperties.getApiKey());
+            }
+
+            if (StringUtils.hasText(webhookEvent.getAdapterProviderCode())) {
+                headers.add(BaseIntegrationConstant.HEADER_ADAPTER_PROVIDER_CODE, webhookEvent.getAdapterProviderCode());
+            }
+
+            final ConfigHttpIntegration configHttpIntegration = ConfigHttpIntegration.builder()
+                .integrationCode(INTEGRATION_CODE)
+                .host(paymentGatewayProperties.getBaseUrl().trim())
+                .integrationPath(path)
+                .timeout(Duration.ofMillis(timeoutMs))
+                .retryEnabled(Boolean.TRUE)
+                .maxRetries(DEFAULT_MAX_RETRIES)
+                .build();
+
+            final ClientHttpRequest<GatewayWebhookRequest> httpRequest = ClientHttpRequest.<GatewayWebhookRequest>builder()
+                .configIntegration(configHttpIntegration)
+                .method(HttpMethodEnum.POST)
+                .headers(headers)
+                .body(request)
+                .timeout(Duration.ofMillis(timeoutMs))
+                .acceptedStatusCodes(ACCEPTED_GATEWAY_STATUS_CODES)
+                .requestId(resolveRequestId(webhookEvent))
+                .integrationId(resolveIntegrationId(webhookEvent))
+                .build();
 
             log.info(
                 "Dispatching webhook event to Gateway - eventType=[{}], uuid=[{}], adapterProviderCode=[{}]",
@@ -110,18 +138,14 @@ public class PaymentGatewayWebhookAdapter implements IPaymentGatewayWebhookAdapt
                     TimeoutException.class,
                     ex -> new GatewayWebhookException(
                         GATEWAY_TIMEOUT_CODE,
-                        "Gateway webhook dispatch timed out after [" + timeoutMs + "ms] for event uuid=["
-                            + webhookEvent.getUuid() + "]",
-                        ex
+                        "Gateway webhook dispatch timed out after [" + timeoutMs + "ms] for event uuid=[" + webhookEvent.getUuid() + "]"
                     )
                 )
                 .onErrorMap(
                     BusinessException.class,
                     ex -> new GatewayWebhookException(
                         GATEWAY_HTTP_ERROR_CODE,
-                        "Gateway webhook dispatch failed for event uuid=[" + webhookEvent.getUuid() + "]: "
-                            + ex.getMessage(),
-                        ex
+                        "Gateway webhook dispatch failed for event uuid=[" + webhookEvent.getUuid() + "]: " + ex.getMessage()
                     )
                 )
                 .doOnNext(response -> logSuccess(webhookEvent, response, startNanos))
@@ -132,53 +156,6 @@ public class PaymentGatewayWebhookAdapter implements IPaymentGatewayWebhookAdapt
                     error.getMessage()
                 ));
         });
-    }
-
-    private ClientHttpRequest<GatewayWebhookRequest> buildClientHttpRequest(final WebhookEvent webhookEvent,
-                                                                            final GatewayWebhookRequest request,
-                                                                            final long timeoutMs,
-                                                                            final String path) {
-        return ClientHttpRequest.<GatewayWebhookRequest>builder()
-            .configIntegration(buildConfigHttpIntegration(timeoutMs, path))
-            .method(HttpMethodEnum.POST)
-            .headers(buildRequestHeaders(webhookEvent))
-            .body(request)
-            .timeout(Duration.ofMillis(timeoutMs))
-            .acceptedStatusCodes(ACCEPTED_GATEWAY_STATUS_CODES)
-            .requestId(resolveRequestId(webhookEvent))
-            .integrationId(resolveIntegrationId(webhookEvent))
-            .build();
-    }
-
-    private ConfigHttpIntegration buildConfigHttpIntegration(final long timeoutMs, final String path) {
-        return ConfigHttpIntegration.builder()
-            .integrationCode(INTEGRATION_CODE)
-            .host(paymentGatewayProperties.getBaseUrl().trim())
-            .integrationPath(path)
-            .timeout(Duration.ofMillis(timeoutMs))
-            .retryEnabled(Boolean.TRUE)
-            .maxRetries(DEFAULT_MAX_RETRIES)
-            .build();
-    }
-
-    private HttpHeaders buildRequestHeaders(final WebhookEvent webhookEvent) {
-
-        final HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        if (StringUtils.hasText(webhookEvent.getIdempotencyKey())) {
-            headers.add(BaseIntegrationConstant.HEADER_IDEMPOTENCY_KEY, webhookEvent.getIdempotencyKey());
-        }
-
-        if (StringUtils.hasText(paymentGatewayProperties.getApiKey())) {
-            headers.add(BaseIntegrationConstant.HEADER_API_KEY, paymentGatewayProperties.getApiKey());
-        }
-
-        if (StringUtils.hasText(webhookEvent.getAdapterProviderCode())) {
-            headers.add(BaseIntegrationConstant.HEADER_ADAPTER_PROVIDER_CODE, webhookEvent.getAdapterProviderCode());
-        }
-
-        return headers;
     }
 
     private String resolveWebhookEventPath() {
