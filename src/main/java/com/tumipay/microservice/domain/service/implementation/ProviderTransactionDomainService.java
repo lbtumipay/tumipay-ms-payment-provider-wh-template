@@ -195,7 +195,7 @@ public class ProviderTransactionDomainService implements IProviderTransactionDom
 
             CommonValidationUtils.validateText(transaction.getAdapterProviderCode(), "adapterProviderCode", errors);
             CommonValidationUtils.validateRequiredEnum(transaction.getTransactionType(), "transactionType", errors);
-            CommonValidationUtils.validateUuidText(transaction.getTransactionId(), "transactionId", errors);
+            CommonValidationUtils.validateText(transaction.getTransactionId(), "transactionId", errors);
             CommonValidationUtils.validateText(transaction.getReferenceId(), "transactionReferenceId", errors);
             CommonValidationUtils.validateText(transaction.getIdempotencyKey(), "idempotencyKey", errors);
             CommonValidationUtils.validateText(transaction.getCurrency(), "currency", errors);
@@ -227,7 +227,7 @@ public class ProviderTransactionDomainService implements IProviderTransactionDom
                 return Mono.just(buildFailure(errors));
             }
 
-            CommonValidationUtils.validateUuidText(transaction.getTransactionId(), "transactionId", errors);
+            CommonValidationUtils.validateText(transaction.getTransactionId(), "transactionId", errors);
             CommonValidationUtils.validateRequiredEnum(transaction.getStatus(), "status", errors);
             CommonValidationUtils.validateText(transaction.getProviderTransactionId(), "providerTransactionId", errors);
 
