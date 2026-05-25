@@ -2,7 +2,7 @@ package com.tumipay.microservice.infrastructure.adapter.input.scheduler;
 
 import com.tumipay.microservice.domain.port.input.IWebhookWorkerUseCase;
 import com.tumipay.microservice.infrastructure.component.constant.WebhookWorkerConstant;
-import com.tumipay.microservice.infrastructure.component.properties.WebhookDispatcherProperties;
+import com.tumipay.microservice.shared.properties.WebhookDispatcherProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.scheduling.annotation.Scheduled;

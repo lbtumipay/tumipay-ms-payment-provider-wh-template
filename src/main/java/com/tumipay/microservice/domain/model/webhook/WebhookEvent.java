@@ -1,6 +1,5 @@
 package com.tumipay.microservice.domain.model.webhook;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import com.tumipay.microservice.domain.component.enums.WebhookProcessingStatusEnum;
 import lombok.*;
 

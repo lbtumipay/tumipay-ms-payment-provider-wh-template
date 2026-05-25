@@ -769,7 +769,7 @@ package com.tumipay.microservice.infrastructure.adapter.input.scheduler;
 
 import com.tumipay.microservice.domain.port.input.IWebhookReceiverUseCase;
 import com.tumipay.microservice.infrastructure.component.constant.WebhookReceiverConstant;
-import com.tumipay.microservice.infrastructure.component.properties.WebhookReceiverProperties;
+import com.tumipay.microservice.shared.properties.WebhookReceiverProperties;
 import com.tumipay.microservice.infrastructure.component.properties.WebhookReceiverSchedulerProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -813,8 +813,8 @@ public class WebhookReceiverScheduler {
      * Delegates to {@link #executeWebhookReceiverFlow()} and subscribes reactively.
      */
     @Scheduled(
-        fixedDelayString = WebhookReceiverConstant.SCHEDULER_WEBHOOK_RECEIVER_FIXED_DELAY_MS,
-        initialDelayString = WebhookReceiverConstant.SCHEDULER_WEBHOOK_RECEIVER_INITIAL_DELAY_MS
+            fixedDelayString = WebhookReceiverConstant.SCHEDULER_WEBHOOK_RECEIVER_FIXED_DELAY_MS,
+            initialDelayString = WebhookReceiverConstant.SCHEDULER_WEBHOOK_RECEIVER_INITIAL_DELAY_MS
     )
     public void executeWebhookReceiverCycle() {
         executeWebhookReceiverFlow().subscribe();
@@ -843,17 +843,17 @@ public class WebhookReceiverScheduler {
             final int batchSize = resolveBatchSize();
 
             return webhookReceiverUseCase.processReceivedBatch(batchSize)
-                .doOnSubscribe(s -> log.debug(
-                    "Starting webhook receiver cycle: batchSize={}", batchSize
-                ))
-                .doOnSuccess(unused -> log.info(
-                    "Webhook receiver cycle completed: batchSize={}", batchSize
-                ))
-                .doOnError(error -> log.error(
-                    "Error in webhook receiver cycle", error
-                ))
-                .onErrorResume(error -> Mono.empty())
-                .doFinally(signalType -> executionInProgress.set(false));
+                    .doOnSubscribe(s -> log.debug(
+                            "Starting webhook receiver cycle: batchSize={}", batchSize
+                    ))
+                    .doOnSuccess(unused -> log.info(
+                            "Webhook receiver cycle completed: batchSize={}", batchSize
+                    ))
+                    .doOnError(error -> log.error(
+                            "Error in webhook receiver cycle", error
+                    ))
+                    .onErrorResume(error -> Mono.empty())
+                    .doFinally(signalType -> executionInProgress.set(false));
         });
     }
 
@@ -864,8 +864,8 @@ public class WebhookReceiverScheduler {
     private int resolveBatchSize() {
         final Integer configured = webhookReceiverProperties.getBatchSize();
         return (configured != null && configured > 0)
-            ? configured
-            : WebhookReceiverConstant.DEFAULT_BATCH_SIZE;
+                ? configured
+                : WebhookReceiverConstant.DEFAULT_BATCH_SIZE;
     }
 }
 ```

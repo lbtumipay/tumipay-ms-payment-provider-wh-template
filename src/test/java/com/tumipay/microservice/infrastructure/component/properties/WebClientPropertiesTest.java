@@ -1,5 +1,6 @@
 package com.tumipay.microservice.infrastructure.component.properties;
 
+import com.tumipay.microservice.shared.properties.WebClientProperties;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.context.properties.ConfigurationProperties;

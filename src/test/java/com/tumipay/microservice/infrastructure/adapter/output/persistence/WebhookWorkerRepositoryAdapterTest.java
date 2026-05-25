@@ -4,7 +4,7 @@ import com.tumipay.microservice.domain.model.webhook.WebhookEvent;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.entity.ProviderWebhookEventEntity;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.mapper.IProviderWebhookEventPersistenceMapper;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.repository.IProviderWebhookEventR2dbcRepository;
-import com.tumipay.microservice.infrastructure.component.properties.WebhookDispatcherProperties;
+import com.tumipay.microservice.shared.properties.WebhookDispatcherProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

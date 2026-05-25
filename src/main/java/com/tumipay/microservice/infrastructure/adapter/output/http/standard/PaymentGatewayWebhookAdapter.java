@@ -7,8 +7,8 @@ import com.tumipay.microservice.infrastructure.adapter.output.http.standard.requ
 import com.tumipay.microservice.infrastructure.adapter.output.http.standard.response.GatewayWebhookResponse;
 import com.tumipay.microservice.infrastructure.component.constant.BaseIntegrationConstant;
 import com.tumipay.microservice.infrastructure.component.properties.PaymentGatewayProperties;
-import com.tumipay.microservice.infrastructure.component.properties.WebClientProperties;
 import com.tumipay.microservice.shared.exception.GatewayWebhookException;
+import com.tumipay.microservice.shared.properties.WebClientProperties;
 import com.tumipay.microservice.shared.util.CommonJsonUtils;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.core.codec.DecodingException;

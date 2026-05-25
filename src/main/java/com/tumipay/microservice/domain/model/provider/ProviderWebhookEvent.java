@@ -1,10 +1,9 @@
 package com.tumipay.microservice.domain.model.provider;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
+
 import java.io.Serial;
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Map;
 
 /**

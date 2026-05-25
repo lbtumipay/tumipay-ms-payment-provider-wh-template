@@ -6,7 +6,7 @@ import com.tumipay.microservice.domain.port.output.IWebhookWorkerRepositoryPort;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.entity.ProviderWebhookEventEntity;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.mapper.IProviderWebhookEventPersistenceMapper;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.repository.IProviderWebhookEventR2dbcRepository;
-import com.tumipay.microservice.infrastructure.component.properties.WebhookDispatcherProperties;
+import com.tumipay.microservice.shared.properties.WebhookDispatcherProperties;
 import com.tumipay.microservice.shared.util.CommonInstantUtils;
 import com.tumipay.microservice.shared.util.CommonIntegerUtils;
 import com.tumipay.microservice.shared.util.CommonStringUtils;

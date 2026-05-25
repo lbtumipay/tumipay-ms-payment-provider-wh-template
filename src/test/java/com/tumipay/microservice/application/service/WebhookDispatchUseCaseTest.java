@@ -9,11 +9,11 @@ import com.tumipay.microservice.domain.port.output.IPaymentGatewayWebhookAdapter
 import com.tumipay.microservice.domain.service.contract.IProviderTransactionDomainService;
 import com.tumipay.microservice.domain.service.contract.IProviderWebhookEventClassifierService;
 import com.tumipay.microservice.domain.service.contract.IProviderWebhookEventDomainService;
-import com.tumipay.microservice.infrastructure.component.properties.WebhookDispatcherProperties;
 import com.tumipay.microservice.shared.dto.DomainOperationResult;
 import com.tumipay.microservice.shared.enums.BaseErrorCodeEnum;
 import com.tumipay.microservice.shared.exception.BusinessException;
 import com.tumipay.microservice.shared.exception.GatewayWebhookException;
+import com.tumipay.microservice.shared.properties.WebhookDispatcherProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -26,14 +26,8 @@ import reactor.test.StepVerifier;
 
 import java.time.Instant;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
 /**
  * WebhookDispatchUseCaseTest

@@ -1,4 +1,4 @@
-package com.tumipay.microservice.infrastructure.component.properties;
+package com.tumipay.microservice.shared.properties;
 
 import com.tumipay.microservice.infrastructure.component.constant.WebhookWorkerConstant;
 import jakarta.validation.constraints.Min;

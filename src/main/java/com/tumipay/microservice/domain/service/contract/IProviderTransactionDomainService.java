@@ -3,7 +3,6 @@ package com.tumipay.microservice.domain.service.contract;
 import com.tumipay.microservice.domain.model.provider.ProviderTransaction;
 import com.tumipay.microservice.domain.model.transaction.StandardTransactionResult;
 import com.tumipay.microservice.shared.dto.DomainOperationResult;
-import com.tumipay.microservice.shared.dto.DomainValidationResult;
 import reactor.core.publisher.Mono;
 
 /**
@@ -33,7 +32,7 @@ public interface IProviderTransactionDomainService
      * @return a {@link Mono} emitting a {@link DomainValidationResult} indicating
      *         whether the transaction is new (valid) or already registered (invalid).
      */
-    Mono<DomainValidationResult> validateIdempotency(String transactionId);
+    Mono<DomainOperationResult<Void>> validateIdempotency(String transactionId);
 
     /**
      * Retrieves a standardized transaction result by the internal TumiPay transaction identifier.

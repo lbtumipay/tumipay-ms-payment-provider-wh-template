@@ -277,9 +277,9 @@ class DomainValidationResultTest {
     void failureWithMessageAndErrors_shouldKeepDetailedErrors() {
         List<String> errors = List.of("field amount required", "field currency invalid");
 
-        DomainValidationResult result = DomainValidationResult.failure("validation failed", errors);
+        CommonValidationResult result = CommonValidationResult.failure("validation failed", errors);
 
-        assertEquals(OperationStatusEnum.FAILED, result.getStatus());
+        assertEquals(BaseOperationStatusEnum.FAILED, result.getStatus());
         assertEquals("validation failed", result.getErrorMessage());
         assertEquals(errors, result.getErrors());
         assertNotNull(result.getValidationErrors());
@@ -294,9 +294,9 @@ class DomainValidationResultTest {
             ValidationError.builder().field("currency").message("invalid").build()
         );
 
-        DomainValidationResult result = DomainValidationResult.failures("validation failed", validationErrors);
+        CommonValidationResult result = CommonValidationResult.failures("validation failed", validationErrors);
 
-        assertEquals(OperationStatusEnum.FAILED, result.getStatus());
+        assertEquals(BaseOperationStatusEnum.FAILED, result.getStatus());
         assertEquals("validation failed", result.getErrorMessage());
         assertNotNull(result.getErrors());
         assertTrue(result.getErrors().isEmpty());
@@ -306,8 +306,8 @@ class DomainValidationResultTest {
     @Test
     @DisplayName("failure/failures - should support empty lists")
     void failureMethods_shouldSupportEmptyLists() {
-        DomainValidationResult stringErrorsResult = DomainValidationResult.failure("no details", Collections.emptyList());
-        DomainValidationResult validationErrorsResult = DomainValidationResult.failures("no details", Collections.emptyList());
+        CommonValidationResult stringErrorsResult = CommonValidationResult.failure("no details", Collections.emptyList());
+        CommonValidationResult validationErrorsResult = CommonValidationResult.failures("no details", Collections.emptyList());
 
         assertTrue(stringErrorsResult.getErrors().isEmpty());
         assertTrue(validationErrorsResult.getValidationErrors().isEmpty());
@@ -321,7 +321,7 @@ class DomainValidationResultTest {
             ValidationError.builder().field("email").message("invalid format").build()
         );
 
-        DomainValidationResult result = DomainValidationResult.builder()
+        CommonValidationResult result = CommonValidationResult.builder()
             .status(OperationStatusEnum.FAILED)
             .errorMessage("builder error")
             .errors(errors)

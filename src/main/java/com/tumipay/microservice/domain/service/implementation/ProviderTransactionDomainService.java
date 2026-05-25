@@ -6,8 +6,9 @@ import com.tumipay.microservice.domain.model.transaction.StandardTransactionResu
 import com.tumipay.microservice.domain.port.output.IAdapterTransactionRepositoryPort;
 import com.tumipay.microservice.domain.port.output.IProviderTransactionRepositoryPort;
 import com.tumipay.microservice.domain.service.contract.IProviderTransactionDomainService;
+import com.tumipay.microservice.shared.dto.CommonValidationResult;
 import com.tumipay.microservice.shared.dto.DomainOperationResult;
-import com.tumipay.microservice.shared.dto.DomainValidationResult;
+import com.tumipay.microservice.shared.enums.BaseOperationStatusEnum;
 import com.tumipay.microservice.shared.util.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -105,26 +106,35 @@ public class ProviderTransactionDomainService implements IProviderTransactionDom
      * {@inheritDoc}
      */
     @Override
-    public Mono<DomainValidationResult> validateIdempotency(String idempotencyKey) {
+    public Mono<DomainOperationResult<Void>> validateIdempotency(String idempotencyKey) {
 
         if (CommonStringUtils.isBlank(idempotencyKey)) {
-            return Mono.just(DomainValidationResult.failure("idempotencyKey is required and cannot be empty"));
+            return Mono.just(DomainOperationResult.<Void>builder()
+                .status(OperationStatusEnum.FAILED)
+                .errorMessage("idempotencyKey is required and cannot be empty")
+                .build());
         }
 
         return providerTransactionRepositoryPort.findByIdempotencyKey(idempotencyKey)
             .flatMap(existingTransaction -> {
                 log.warn("Duplicate idempotency detected for idempotencyKey={}", idempotencyKey);
-                return Mono.just(DomainValidationResult.failure(
-                    "Duplicate transaction detected for idempotency_key " + idempotencyKey
-                ));
+                return Mono.just(DomainOperationResult.<Void>builder()
+                    .status(OperationStatusEnum.FAILED)
+                    .errorMessage("Duplicate transaction detected for idempotency_key " + idempotencyKey)
+                    .build());
             })
             .switchIfEmpty(Mono.defer(() -> {
                 log.debug("No duplicate found for idempotencyKey={}", idempotencyKey);
-                return Mono.just(DomainValidationResult.success());
+                return Mono.just(DomainOperationResult.<Void>builder()
+                    .status(OperationStatusEnum.SUCCESS)
+                    .build());
             }))
             .onErrorResume(error -> {
                 log.error("Error validating idempotency for idempotencyKey={}, error={}", idempotencyKey, error.getMessage(), error);
-                return Mono.just(DomainValidationResult.failure("Error validating idempotency: " + error.getMessage()));
+                return Mono.just(DomainOperationResult.<Void>builder()
+                    .status(OperationStatusEnum.FAILED)
+                    .errorMessage("Error validating idempotency: " + error.getMessage())
+                    .build());
             })
             .transform(CommonLoggerUtils.withProcessLogging("validateProviderTransactionIdempotency"));
     }
@@ -144,15 +154,15 @@ public class ProviderTransactionDomainService implements IProviderTransactionDom
         return adapterTransactionRepositoryPort.findByProviderTransactionId(providerTransactionId);
     }
 
-    private Mono<DomainValidationResult> handleDomainValidationResult(DomainValidationResult result) {
+    private Mono<CommonValidationResult> handleDomainValidationResult(CommonValidationResult result) {
 
-        if (result.getStatus() == OperationStatusEnum.FAILED) {
+        if (result.getStatus() == BaseOperationStatusEnum.FAILED) {
             log.error(CommonErrorUtils.toJson(result.getErrors()));
             return Mono.error(new IllegalArgumentException(result.getErrorMessage()));
         }
 
-        return Mono.just(DomainValidationResult.builder()
-            .status(OperationStatusEnum.SUCCESS)
+        return Mono.just(CommonValidationResult.builder()
+            .status(BaseOperationStatusEnum.SUCCESS)
             .build()
         );
     }
@@ -173,7 +183,7 @@ public class ProviderTransactionDomainService implements IProviderTransactionDom
         );
     }
 
-    private Function<ProviderTransaction, Mono<DomainValidationResult>> validateCreate() {
+    private Function<ProviderTransaction, Mono<CommonValidationResult>> validateCreate() {
 
         return transaction -> {
 
@@ -199,15 +209,15 @@ public class ProviderTransactionDomainService implements IProviderTransactionDom
 
             return Mono.just(
                 errors.isEmpty()
-                    ? DomainValidationResult.builder()
-                      .status(OperationStatusEnum.SUCCESS)
+                    ? CommonValidationResult.builder()
+                      .status(BaseOperationStatusEnum.SUCCESS)
                       .build()
                     : buildFailure(errors)
             );
         };
     }
 
-    private Function<ProviderTransaction, Mono<DomainValidationResult>> validateUpdate() {
+    private Function<ProviderTransaction, Mono<CommonValidationResult>> validateUpdate() {
 
         return transaction -> {
 
@@ -224,8 +234,8 @@ public class ProviderTransactionDomainService implements IProviderTransactionDom
 
             return Mono.just(
                 errors.isEmpty()
-                    ? DomainValidationResult.builder()
-                      .status(OperationStatusEnum.SUCCESS)
+                    ? CommonValidationResult.builder()
+                      .status(BaseOperationStatusEnum.SUCCESS)
                       .build()
                     : buildFailure(errors)
             );
@@ -234,9 +244,9 @@ public class ProviderTransactionDomainService implements IProviderTransactionDom
 
 
 
-    private DomainValidationResult buildFailure(List<String> errors) {
-        return DomainValidationResult.builder()
-            .status(OperationStatusEnum.FAILED)
+    private CommonValidationResult buildFailure(List<String> errors) {
+        return CommonValidationResult.builder()
+            .status(BaseOperationStatusEnum.FAILED)
             .errorMessage("ProviderTransaction validation failed")
             .errors(errors)
             .build();

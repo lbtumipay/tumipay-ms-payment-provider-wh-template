@@ -1,7 +1,7 @@
 package com.tumipay.microservice.infrastructure.adapter.input.scheduler;
 
 import com.tumipay.microservice.domain.port.input.IWebhookReceiverUseCase;
-import com.tumipay.microservice.infrastructure.component.properties.WebhookReceiverProperties;
+import com.tumipay.microservice.shared.properties.WebhookReceiverProperties;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;

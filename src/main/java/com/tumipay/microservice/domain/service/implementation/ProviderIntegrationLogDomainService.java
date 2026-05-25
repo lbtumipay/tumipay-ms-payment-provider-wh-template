@@ -1,11 +1,12 @@
 package com.tumipay.microservice.domain.service.implementation;
 
-import com.tumipay.microservice.domain.component.enums.OperationStatusEnum;
 import com.tumipay.microservice.domain.model.provider.ProviderIntegrationLog;
 import com.tumipay.microservice.domain.port.output.IProviderIntegrationLogRepositoryPort;
 import com.tumipay.microservice.domain.service.contract.IProviderIntegrationLogDomainService;
+import com.tumipay.microservice.shared.dto.CommonValidationResult;
+import com.tumipay.microservice.domain.component.enums.OperationStatusEnum;
 import com.tumipay.microservice.shared.dto.DomainOperationResult;
-import com.tumipay.microservice.shared.dto.DomainValidationResult;
+import com.tumipay.microservice.shared.enums.BaseOperationStatusEnum;
 import com.tumipay.microservice.shared.util.CommonErrorUtils;
 import com.tumipay.microservice.shared.util.CommonLoggerUtils;
 import com.tumipay.microservice.shared.util.CommonUuidUtils;
@@ -95,15 +96,15 @@ public class ProviderIntegrationLogDomainService implements IProviderIntegration
             .transform(CommonLoggerUtils.withProcessLogging("updateProviderIntegrationLog"));
     }
 
-    private Mono<DomainValidationResult> handleDomainValidationResult(DomainValidationResult result) {
+    private Mono<CommonValidationResult> handleDomainValidationResult(CommonValidationResult result) {
 
-        if (result.getStatus() == OperationStatusEnum.FAILED) {
+        if (result.getStatus() == BaseOperationStatusEnum.FAILED) {
             log.error("Error in updateDomainEntity validation, validations errors {},", CommonErrorUtils.toJson(result.getErrors()));
             return Mono.error(new IllegalArgumentException(result.getErrorMessage()));
         }
 
-        return Mono.just(DomainValidationResult.builder()
-            .status(OperationStatusEnum.SUCCESS)
+        return Mono.just(CommonValidationResult.builder()
+            .status(BaseOperationStatusEnum.SUCCESS)
             .build()
         );
     }
@@ -124,7 +125,7 @@ public class ProviderIntegrationLogDomainService implements IProviderIntegration
         );
     }
 
-    private Function<ProviderIntegrationLog, Mono<DomainValidationResult>> validateCreate() {
+    private Function<ProviderIntegrationLog, Mono<CommonValidationResult>> validateCreate() {
 
         return log -> {
 
@@ -143,15 +144,15 @@ public class ProviderIntegrationLogDomainService implements IProviderIntegration
 
             return Mono.just(
                 errors.isEmpty()
-                    ? DomainValidationResult.builder()
-                      .status(OperationStatusEnum.SUCCESS)
+                    ? CommonValidationResult.builder()
+                      .status(BaseOperationStatusEnum.SUCCESS)
                       .build()
                     : buildFailure(errors)
             );
         };
     }
 
-    private Function<ProviderIntegrationLog, Mono<DomainValidationResult>> validateUpdate() {
+    private Function<ProviderIntegrationLog, Mono<CommonValidationResult>> validateUpdate() {
 
         return log -> {
 
@@ -175,17 +176,17 @@ public class ProviderIntegrationLogDomainService implements IProviderIntegration
 
             return Mono.just(
                 errors.isEmpty()
-                    ? DomainValidationResult.builder()
-                      .status(OperationStatusEnum.SUCCESS)
+                    ? CommonValidationResult.builder()
+                      .status(BaseOperationStatusEnum.SUCCESS)
                       .build()
                     : buildFailure(errors)
             );
         };
     }
 
-    private DomainValidationResult buildFailure(List<String> errors) {
-        return DomainValidationResult.builder()
-            .status(OperationStatusEnum.FAILED)
+    private CommonValidationResult buildFailure(List<String> errors) {
+        return CommonValidationResult.builder()
+            .status(BaseOperationStatusEnum.FAILED)
             .errorMessage("ProviderIntegrationLog validation failed")
             .errors(errors)
             .build();

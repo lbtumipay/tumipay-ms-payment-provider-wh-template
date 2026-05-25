@@ -5,8 +5,9 @@ import com.tumipay.microservice.domain.model.webhook.WebhookEvent;
 import com.tumipay.microservice.domain.port.output.IProviderWebhookEventRepositoryPort;
 import com.tumipay.microservice.domain.port.output.IWebhookWorkerRepositoryPort;
 import com.tumipay.microservice.domain.service.contract.IProviderWebhookEventDomainService;
+import com.tumipay.microservice.shared.dto.CommonValidationResult;
 import com.tumipay.microservice.shared.dto.DomainOperationResult;
-import com.tumipay.microservice.shared.dto.DomainValidationResult;
+import com.tumipay.microservice.shared.enums.BaseOperationStatusEnum;
 import com.tumipay.microservice.shared.util.*;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -90,22 +91,28 @@ public class ProviderWebhookEventDomainService implements IProviderWebhookEventD
     }
 
     @Override
-    public Mono<DomainValidationResult> validateIdempotency(String idempotencyKey) {
+    public Mono<DomainOperationResult<Void>> validateIdempotency(String idempotencyKey) {
 
         if (CommonStringUtils.isBlank(idempotencyKey)) {
-            return Mono.just(DomainValidationResult.failure("idempotencyKey is required and cannot be empty"));
+            return Mono.just(DomainOperationResult.<Void>builder()
+                .status(OperationStatusEnum.FAILED)
+                .errorMessage("idempotencyKey is required and cannot be empty")
+                .build());
         }
 
         return providerWebhookEventRepositoryPort.findByIdempotencyKey(idempotencyKey)
             .flatMap(existingWebhookEvent -> {
                 log.warn("Duplicate webhook idempotency detected for idempotencyKey={}", idempotencyKey);
-                return Mono.just(DomainValidationResult.failure(
-                    "Duplicate webhook event detected for idempotency_key " + idempotencyKey
-                ));
+                return Mono.just(DomainOperationResult.<Void>builder()
+                    .status(OperationStatusEnum.FAILED)
+                    .errorMessage("Duplicate webhook event detected for idempotency_key " + idempotencyKey)
+                    .build());
             })
             .switchIfEmpty(Mono.defer(() -> {
                 log.debug("No duplicate webhook event found for idempotencyKey={}", idempotencyKey);
-                return Mono.just(DomainValidationResult.success());
+                return Mono.just(DomainOperationResult.<Void>builder()
+                    .status(OperationStatusEnum.SUCCESS)
+                    .build());
             }))
             .onErrorResume(error -> {
                 log.error(
@@ -113,7 +120,10 @@ public class ProviderWebhookEventDomainService implements IProviderWebhookEventD
                     idempotencyKey,
                     error.getMessage()
                 );
-                return Mono.just(DomainValidationResult.failure("Error validating idempotency: " + error.getMessage()));
+                return Mono.just(DomainOperationResult.<Void>builder()
+                    .status(OperationStatusEnum.FAILED)
+                    .errorMessage("Error validating idempotency: " + error.getMessage())
+                    .build());
             })
             .transform(CommonLoggerUtils.withProcessLogging("validateProviderWebhookEventIdempotency"));
     }
@@ -162,15 +172,15 @@ public class ProviderWebhookEventDomainService implements IProviderWebhookEventD
             .transform(CommonLoggerUtils.withProcessLogging("markWebhookEventForRetry"));
     }
 
-    private Mono<DomainValidationResult> handleDomainValidationResult(DomainValidationResult result) {
+    private Mono<CommonValidationResult> handleDomainValidationResult(CommonValidationResult result) {
 
-        if (result.getStatus() == OperationStatusEnum.FAILED) {
+        if (result.getStatus() == BaseOperationStatusEnum.FAILED) {
             log.error(CommonErrorUtils.toJson(result.getErrors()));
             return Mono.error(new IllegalArgumentException(result.getErrorMessage()));
         }
 
-        return Mono.just(DomainValidationResult.builder()
-            .status(OperationStatusEnum.SUCCESS)
+        return Mono.just(CommonValidationResult.builder()
+            .status(BaseOperationStatusEnum.SUCCESS)
             .build()
         );
     }
@@ -191,7 +201,7 @@ public class ProviderWebhookEventDomainService implements IProviderWebhookEventD
         );
     }
 
-    private Function<WebhookEvent, Mono<DomainValidationResult>> validateCreate() {
+    private Function<WebhookEvent, Mono<CommonValidationResult>> validateCreate() {
 
         return webhookEvent -> {
 
@@ -209,15 +219,15 @@ public class ProviderWebhookEventDomainService implements IProviderWebhookEventD
 
             return Mono.just(
                 errors.isEmpty()
-                    ? DomainValidationResult.builder()
-                      .status(OperationStatusEnum.SUCCESS)
+                    ? CommonValidationResult.builder()
+                      .status(BaseOperationStatusEnum.SUCCESS)
                       .build()
                     : buildFailure(errors)
             );
         };
     }
 
-    private Function<WebhookEvent, Mono<DomainValidationResult>> validateUpdate() {
+    private Function<WebhookEvent, Mono<CommonValidationResult>> validateUpdate() {
 
         return webhookEvent -> {
 
@@ -233,17 +243,17 @@ public class ProviderWebhookEventDomainService implements IProviderWebhookEventD
 
             return Mono.just(
                 errors.isEmpty()
-                    ? DomainValidationResult.builder()
-                      .status(OperationStatusEnum.SUCCESS)
+                    ? CommonValidationResult.builder()
+                      .status(BaseOperationStatusEnum.SUCCESS)
                       .build()
                     : buildFailure(errors)
             );
         };
     }
 
-    private DomainValidationResult buildFailure(List<String> errors) {
-        return DomainValidationResult.builder()
-            .status(OperationStatusEnum.FAILED)
+    private CommonValidationResult buildFailure(List<String> errors) {
+        return CommonValidationResult.builder()
+            .status(BaseOperationStatusEnum.FAILED)
             .errorMessage("ProviderWebhookEvent validation failed")
             .errors(errors)
             .build();

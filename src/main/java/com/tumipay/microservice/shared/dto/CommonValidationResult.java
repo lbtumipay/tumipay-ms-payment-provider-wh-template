@@ -44,6 +44,11 @@ public class CommonValidationResult implements Serializable {
     private BaseOperationStatusEnum status;
 
     /**
+     * Enum error code representing the failure reason (optional, can be used for localization or error handling logic).
+     */
+    private String errorCode;
+
+    /**
      * High-level error message describing the failure.
      */
     private String errorMessage;
@@ -54,6 +59,12 @@ public class CommonValidationResult implements Serializable {
     @Builder.Default
     private List<String> errors = Collections.emptyList();
 
+    /**
+     * List of domain or validation error messages.
+     */
+    @Builder.Default
+    private final List<ValidationError> validationErrors = Collections.emptyList();
+
 
     /**
      * Factory method for successful operations.
@@ -63,6 +74,20 @@ public class CommonValidationResult implements Serializable {
     public static CommonValidationResult success() {
         return CommonValidationResult.builder()
             .status(BaseOperationStatusEnum.SUCCESS)
+            .build();
+    }
+
+    /**
+     * Factory method for failed operations.
+     *
+     * @param errorMessage high-level error message
+     * @return failed {@link CommonValidationResult}
+     */
+    public static CommonValidationResult failure(String errorCode, String errorMessage) {
+        return CommonValidationResult.builder()
+            .status(BaseOperationStatusEnum.FAILED)
+            .errorCode(errorCode)
+            .errorMessage(errorMessage)
             .build();
     }
 
@@ -91,6 +116,21 @@ public class CommonValidationResult implements Serializable {
             .status(BaseOperationStatusEnum.FAILED)
             .errorMessage(errorMessage)
             .errors(errors)
+            .build();
+    }
+
+    /**
+     * Factory method for failed operations.
+     *
+     * @param errorMessage     high-level error message
+     * @param validationErrors detailed error list
+     * @return failed {@link CommonValidationResult}
+     */
+    public static <E extends Serializable> CommonValidationResult failures(String errorMessage, List<ValidationError> validationErrors) {
+        return CommonValidationResult.builder()
+            .status(BaseOperationStatusEnum.FAILED)
+            .errorMessage(errorMessage)
+            .validationErrors(validationErrors)
             .build();
     }
 

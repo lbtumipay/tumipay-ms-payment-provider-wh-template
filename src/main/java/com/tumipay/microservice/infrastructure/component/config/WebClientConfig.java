@@ -1,6 +1,6 @@
 package com.tumipay.microservice.infrastructure.component.config;
 
-import com.tumipay.microservice.infrastructure.component.properties.WebClientProperties;
+import com.tumipay.microservice.shared.properties.WebClientProperties;
 import io.netty.channel.ChannelOption;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;

@@ -109,4 +109,3 @@ class DomainOperationResultTest {
         assertInstanceOf(java.io.Serializable.class, DomainOperationResult.success("value"));
     }
 }
-

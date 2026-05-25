@@ -2,7 +2,6 @@ package com.tumipay.microservice.domain.service.contract;
 
 import com.tumipay.microservice.domain.model.webhook.WebhookEvent;
 import com.tumipay.microservice.shared.dto.DomainOperationResult;
-import com.tumipay.microservice.shared.dto.DomainValidationResult;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
@@ -31,7 +30,7 @@ public interface IProviderWebhookEventDomainService
      * @return a {@link Mono} emitting a {@link DomainValidationResult} indicating
      *         whether the event is new (valid) or already processed (invalid).
      */
-    Mono<DomainValidationResult> validateIdempotency(String idempotencyKey);
+    Mono<DomainOperationResult<Void>> validateIdempotency(String idempotencyKey);
 
     /**
      * Atomically claims a batch of pending webhook events and assigns them to the given worker.

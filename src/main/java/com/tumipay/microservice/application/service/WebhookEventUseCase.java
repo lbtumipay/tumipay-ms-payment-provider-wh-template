@@ -5,11 +5,11 @@ import com.tumipay.microservice.domain.component.enums.WebhookProcessingStatusEn
 import com.tumipay.microservice.domain.model.webhook.WebhookEvent;
 import com.tumipay.microservice.domain.model.webhook.WebhookEventResult;
 import com.tumipay.microservice.domain.port.input.IWebhookEventUseCase;
-import com.tumipay.microservice.domain.service.contract.IDomainValidationService;
 import com.tumipay.microservice.domain.service.contract.IProviderWebhookEventDomainService;
 import com.tumipay.microservice.shared.enums.BaseErrorCodeEnum;
 import com.tumipay.microservice.shared.exception.BusinessException;
 import com.tumipay.microservice.shared.exception.ValidationException;
+import com.tumipay.microservice.shared.validation.ICommonValidationContract;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -34,8 +34,8 @@ import java.util.UUID;
 @AllArgsConstructor
 public class WebhookEventUseCase implements IWebhookEventUseCase {
 
-    private final IDomainValidationService domainValidationService;
     private final IProviderWebhookEventDomainService webhookEventDomainService;
+    private final ICommonValidationContract<WebhookEvent> webhookEventValidationComponent;
 
     @Override
     public Mono<WebhookEventResult> processWebhookEvent(WebhookEvent webhookEvent) {
@@ -57,10 +57,10 @@ public class WebhookEventUseCase implements IWebhookEventUseCase {
 
     private Mono<WebhookEventComposition> validateWebhookEvent(WebhookEvent webhookEvent) {
 
-        return domainValidationService.validate("ProviderWebhookEvent", webhookEvent)
-            .flatMap(domainValidationResult -> {
+        return webhookEventValidationComponent.validate(webhookEvent)
+            .flatMap(commonValidationResult -> {
 
-                if (domainValidationResult.isSuccess()) {
+                if (commonValidationResult.isSuccess()) {
                     return Mono.just(WebhookEventComposition.builder()
                         .webhookEvent(webhookEvent)
                         .build()
@@ -69,8 +69,8 @@ public class WebhookEventUseCase implements IWebhookEventUseCase {
 
                 return Mono.error(new ValidationException(
                     BaseErrorCodeEnum.VALIDATION_ERROR.getCode(),
-                    domainValidationResult.getErrorMessage(),
-                    domainValidationResult.getValidationErrors())
+                    commonValidationResult.getErrorMessage(),
+                    commonValidationResult.getValidationErrors())
                 );
             });
     }

@@ -10,10 +10,10 @@ import com.tumipay.microservice.domain.port.output.IPaymentGatewayWebhookAdapter
 import com.tumipay.microservice.domain.service.contract.IProviderTransactionDomainService;
 import com.tumipay.microservice.domain.service.contract.IProviderWebhookEventClassifierService;
 import com.tumipay.microservice.domain.service.contract.IProviderWebhookEventDomainService;
-import com.tumipay.microservice.infrastructure.component.properties.WebhookDispatcherProperties;
 import com.tumipay.microservice.shared.enums.BaseErrorCodeEnum;
 import com.tumipay.microservice.shared.exception.BusinessException;
 import com.tumipay.microservice.shared.exception.GatewayWebhookException;
+import com.tumipay.microservice.shared.properties.WebhookDispatcherProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
