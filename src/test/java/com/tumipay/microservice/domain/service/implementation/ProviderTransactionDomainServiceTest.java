@@ -1,12 +1,12 @@
 package com.tumipay.microservice.domain.service.implementation;
 
-import com.tumipay.microservice.domain.component.enums.OperationStatusEnum;
 import com.tumipay.microservice.domain.component.enums.PaymentMethodEnum;
 import com.tumipay.microservice.domain.component.enums.TransactionStatusEnum;
 import com.tumipay.microservice.domain.component.enums.TransactionTypeEnum;
 import com.tumipay.microservice.domain.model.provider.ProviderTransaction;
 import com.tumipay.microservice.domain.port.output.IAdapterTransactionRepositoryPort;
 import com.tumipay.microservice.domain.port.output.IProviderTransactionRepositoryPort;
+import com.tumipay.microservice.shared.enums.BaseOperationStatusEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -78,7 +78,7 @@ class ProviderTransactionDomainServiceTest {
     void getDomainEntityByUuId_blankUuid_shouldReturnFailure() {
         StepVerifier.create(service.getDomainEntityByUuId(""))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("entityUuId is required and cannot be empty", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -87,7 +87,7 @@ class ProviderTransactionDomainServiceTest {
     void getDomainEntityByUuId_invalidUuidFormat_shouldReturnFailure() {
         StepVerifier.create(service.getDomainEntityByUuId("not-a-valid-uuid"))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("entityUuId format is invalid", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -99,7 +99,7 @@ class ProviderTransactionDomainServiceTest {
         entity.setUuid(uuid);
         when(repositoryPort.findByUuid(uuid)).thenReturn(Mono.just(entity));
         StepVerifier.create(service.getDomainEntityByUuId(uuid))
-            .assertNext(r -> assertEquals(OperationStatusEnum.SUCCESS, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.SUCCESS, r.getStatus()))
             .verifyComplete();
     }
 
@@ -109,7 +109,7 @@ class ProviderTransactionDomainServiceTest {
         when(repositoryPort.findByUuid(uuid)).thenReturn(Mono.empty());
         StepVerifier.create(service.getDomainEntityByUuId(uuid))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("ProviderTransaction not found for uuid=" + uuid, r.getErrorMessage());
             }).verifyComplete();
     }
@@ -120,7 +120,7 @@ class ProviderTransactionDomainServiceTest {
         when(repositoryPort.findByUuid(uuid)).thenReturn(Mono.error(new RuntimeException("db error")));
         StepVerifier.create(service.getDomainEntityByUuId(uuid))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("Error getting ProviderTransaction: db error", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -128,7 +128,7 @@ class ProviderTransactionDomainServiceTest {
     @Test
     void saveDomainEntity_nullEntity_shouldReturnFailure() {
         StepVerifier.create(service.saveDomainEntity(null))
-            .assertNext(r -> assertEquals(OperationStatusEnum.FAILED, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus()))
             .verifyComplete();
     }
 
@@ -138,7 +138,7 @@ class ProviderTransactionDomainServiceTest {
             .adapterProviderCode("TP_PROVIDER")
             .build(); // missing most required fields
         StepVerifier.create(service.saveDomainEntity(invalid))
-            .assertNext(r -> assertEquals(OperationStatusEnum.FAILED, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus()))
             .verifyComplete();
     }
 
@@ -147,7 +147,7 @@ class ProviderTransactionDomainServiceTest {
         ProviderTransaction entity = validCreateEntity();
         when(repositoryPort.save(any())).thenReturn(Mono.just(entity));
         StepVerifier.create(service.saveDomainEntity(entity))
-            .assertNext(r -> assertEquals(OperationStatusEnum.SUCCESS, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.SUCCESS, r.getStatus()))
             .verifyComplete();
     }
 
@@ -157,7 +157,7 @@ class ProviderTransactionDomainServiceTest {
         when(repositoryPort.save(any())).thenReturn(Mono.error(new RuntimeException("save error")));
         StepVerifier.create(service.saveDomainEntity(entity))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("Error saving ProviderTransaction: save error", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -167,14 +167,14 @@ class ProviderTransactionDomainServiceTest {
         ProviderTransaction entity = validCreateEntity();
         entity.setAmount(0);
         StepVerifier.create(service.saveDomainEntity(entity))
-            .assertNext(r -> assertEquals(OperationStatusEnum.FAILED, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus()))
             .verifyComplete();
     }
 
     @Test
     void updateDomainEntity_nullEntity_shouldReturnFailure() {
         StepVerifier.create(service.updateDomainEntity(null))
-            .assertNext(r -> assertEquals(OperationStatusEnum.FAILED, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus()))
             .verifyComplete();
     }
 
@@ -184,7 +184,7 @@ class ProviderTransactionDomainServiceTest {
             .transactionId(UUID.randomUUID().toString())
             .build(); // missing status and providerTransactionId
         StepVerifier.create(service.updateDomainEntity(invalid))
-            .assertNext(r -> assertEquals(OperationStatusEnum.FAILED, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus()))
             .verifyComplete();
     }
 
@@ -193,7 +193,7 @@ class ProviderTransactionDomainServiceTest {
         ProviderTransaction entity = validUpdateEntity();
         when(repositoryPort.update(any())).thenReturn(Mono.just(entity));
         StepVerifier.create(service.updateDomainEntity(entity))
-            .assertNext(r -> assertEquals(OperationStatusEnum.SUCCESS, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.SUCCESS, r.getStatus()))
             .verifyComplete();
     }
 
@@ -203,7 +203,7 @@ class ProviderTransactionDomainServiceTest {
         when(repositoryPort.update(any())).thenReturn(Mono.error(new RuntimeException("update error")));
         StepVerifier.create(service.updateDomainEntity(entity))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("Error updating ProviderTransaction: update error", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -212,7 +212,7 @@ class ProviderTransactionDomainServiceTest {
     void validateIdempotency_blankKey_shouldReturnFailure() {
         StepVerifier.create(service.validateIdempotency(""))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("idempotencyKey is required and cannot be empty", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -224,7 +224,7 @@ class ProviderTransactionDomainServiceTest {
 
         StepVerifier.create(service.validateIdempotency(idempotencyKey))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.SUCCESS, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.SUCCESS, r.getStatus());
             }).verifyComplete();
     }
 
@@ -233,7 +233,7 @@ class ProviderTransactionDomainServiceTest {
         String key = UUID.randomUUID().toString();
         when(repositoryPort.findByIdempotencyKey(key)).thenReturn(Mono.empty());
         StepVerifier.create(service.validateIdempotency(key))
-            .assertNext(r -> assertEquals(OperationStatusEnum.SUCCESS, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.SUCCESS, r.getStatus()))
             .verifyComplete();
     }
 
@@ -244,7 +244,7 @@ class ProviderTransactionDomainServiceTest {
             .thenReturn(Mono.error(new RuntimeException("idempotency error")));
         StepVerifier.create(service.validateIdempotency(key))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("Error validating idempotency: idempotency error", r.getErrorMessage());
             }).verifyComplete();
     }

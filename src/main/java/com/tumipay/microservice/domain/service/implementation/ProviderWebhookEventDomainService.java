@@ -1,6 +1,5 @@
 package com.tumipay.microservice.domain.service.implementation;
 
-import com.tumipay.microservice.domain.component.enums.OperationStatusEnum;
 import com.tumipay.microservice.domain.model.webhook.WebhookEvent;
 import com.tumipay.microservice.domain.port.output.IProviderWebhookEventRepositoryPort;
 import com.tumipay.microservice.domain.port.output.IWebhookWorkerRepositoryPort;
@@ -95,7 +94,7 @@ public class ProviderWebhookEventDomainService implements IProviderWebhookEventD
 
         if (CommonStringUtils.isBlank(idempotencyKey)) {
             return Mono.just(DomainOperationResult.<Void>builder()
-                .status(OperationStatusEnum.FAILED)
+                .status(BaseOperationStatusEnum.FAILED)
                 .errorMessage("idempotencyKey is required and cannot be empty")
                 .build());
         }
@@ -104,14 +103,14 @@ public class ProviderWebhookEventDomainService implements IProviderWebhookEventD
             .flatMap(existingWebhookEvent -> {
                 log.warn("Duplicate webhook idempotency detected for idempotencyKey={}", idempotencyKey);
                 return Mono.just(DomainOperationResult.<Void>builder()
-                    .status(OperationStatusEnum.FAILED)
+                    .status(BaseOperationStatusEnum.FAILED)
                     .errorMessage("Duplicate webhook event detected for idempotency_key " + idempotencyKey)
                     .build());
             })
             .switchIfEmpty(Mono.defer(() -> {
                 log.debug("No duplicate webhook event found for idempotencyKey={}", idempotencyKey);
                 return Mono.just(DomainOperationResult.<Void>builder()
-                    .status(OperationStatusEnum.SUCCESS)
+                    .status(BaseOperationStatusEnum.SUCCESS)
                     .build());
             }))
             .onErrorResume(error -> {
@@ -121,7 +120,7 @@ public class ProviderWebhookEventDomainService implements IProviderWebhookEventD
                     error.getMessage()
                 );
                 return Mono.just(DomainOperationResult.<Void>builder()
-                    .status(OperationStatusEnum.FAILED)
+                    .status(BaseOperationStatusEnum.FAILED)
                     .errorMessage("Error validating idempotency: " + error.getMessage())
                     .build());
             })
@@ -187,7 +186,7 @@ public class ProviderWebhookEventDomainService implements IProviderWebhookEventD
 
     private Mono<DomainOperationResult<WebhookEvent>> monoDomainSuccess(WebhookEvent webhookEvent) {
         return Mono.just(DomainOperationResult.<WebhookEvent>builder()
-            .status(OperationStatusEnum.SUCCESS)
+            .status(BaseOperationStatusEnum.SUCCESS)
             .entity(webhookEvent)
             .build()
         );
@@ -195,7 +194,7 @@ public class ProviderWebhookEventDomainService implements IProviderWebhookEventD
 
     private Mono<DomainOperationResult<WebhookEvent>> monoDomainFailure(String errorMessage) {
         return Mono.just(DomainOperationResult.<WebhookEvent>builder()
-            .status(OperationStatusEnum.FAILED)
+            .status(BaseOperationStatusEnum.FAILED)
             .errorMessage(errorMessage)
             .build()
         );

@@ -1,6 +1,6 @@
 package com.tumipay.microservice.shared.dto;
 
-import com.tumipay.microservice.domain.component.enums.OperationStatusEnum;
+import com.tumipay.microservice.shared.enums.BaseOperationStatusEnum;
 import lombok.*;
 
 import java.io.Serial;
@@ -43,7 +43,7 @@ public class DomainOperationResult<E> implements Serializable{
     /**
      * Execution status of the operation.
      */
-    private OperationStatusEnum status;
+    private BaseOperationStatusEnum status;
 
     /**
      * High-level error message describing the failure.
@@ -69,7 +69,7 @@ public class DomainOperationResult<E> implements Serializable{
      */
     public static <E extends Serializable> DomainOperationResult<E> success(E entity) {
         return DomainOperationResult.<E>builder()
-            .status(OperationStatusEnum.SUCCESS)
+            .status(BaseOperationStatusEnum.SUCCESS)
             .entity(entity)
             .build();
     }
@@ -84,7 +84,7 @@ public class DomainOperationResult<E> implements Serializable{
         String errorMessage
     ) {
         return DomainOperationResult.<E>builder()
-            .status(OperationStatusEnum.FAILED)
+            .status(BaseOperationStatusEnum.FAILED)
             .errorMessage(errorMessage)
             .build();
     }
@@ -101,7 +101,7 @@ public class DomainOperationResult<E> implements Serializable{
         List<String> errors
     ) {
         return DomainOperationResult.<E>builder()
-            .status(OperationStatusEnum.FAILED)
+            .status(BaseOperationStatusEnum.FAILED)
             .errorMessage(errorMessage)
             .errors(errors)
             .build();
@@ -113,7 +113,7 @@ public class DomainOperationResult<E> implements Serializable{
      * @return {@code true} if status is SUCCESS
      */
     public boolean isSuccess() {
-        return OperationStatusEnum.SUCCESS.equals(this.status);
+        return BaseOperationStatusEnum.SUCCESS.equals(this.status);
     }
 
     /**
@@ -121,6 +121,6 @@ public class DomainOperationResult<E> implements Serializable{
      * @return {@code true} if status is FAILED
      */
     public boolean isFailed() {
-        return OperationStatusEnum.FAILED.equals(this.status);
+        return BaseOperationStatusEnum.FAILED.equals(this.status);
     }
 }

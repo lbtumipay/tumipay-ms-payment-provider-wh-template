@@ -1,10 +1,10 @@
 package com.tumipay.microservice.domain.service.implementation;
 
-import com.tumipay.microservice.domain.component.enums.OperationStatusEnum;
 import com.tumipay.microservice.domain.component.enums.WebhookProcessingStatusEnum;
 import com.tumipay.microservice.domain.model.webhook.WebhookEvent;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.entity.ProviderWebhookEventEntity;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.repository.IProviderWebhookEventR2dbcRepository;
+import com.tumipay.microservice.shared.enums.BaseOperationStatusEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -62,7 +62,7 @@ class ProviderWebhookEventDomainServiceIntegrationTest {
             .build();
 
         StepVerifier.create(providerWebhookEventDomainService.saveDomainEntity(event))
-            .assertNext(result -> Assertions.assertEquals(OperationStatusEnum.SUCCESS, result.getStatus()))
+            .assertNext(result -> Assertions.assertEquals(BaseOperationStatusEnum.SUCCESS, result.getStatus()))
             .verifyComplete();
 
         ProviderWebhookEventEntity persisted = providerWebhookEventRepository.findByIdempotencyKey(idempotencyKey).block();
@@ -89,7 +89,7 @@ class ProviderWebhookEventDomainServiceIntegrationTest {
 
         StepVerifier.create(providerWebhookEventDomainService.validateIdempotency(idempotencyKey))
             .assertNext(result -> {
-                Assertions.assertEquals(OperationStatusEnum.FAILED, result.getStatus());
+                Assertions.assertEquals(BaseOperationStatusEnum.FAILED, result.getStatus());
                 Assertions.assertTrue(result.getErrorMessage().contains("Duplicate webhook event detected"));
             })
             .verifyComplete();
@@ -114,7 +114,7 @@ class ProviderWebhookEventDomainServiceIntegrationTest {
 
         StepVerifier.create(providerWebhookEventDomainService.getDomainEntityByUuId(uuid.toString()))
             .assertNext(result -> {
-                Assertions.assertEquals(OperationStatusEnum.SUCCESS, result.getStatus());
+                Assertions.assertEquals(BaseOperationStatusEnum.SUCCESS, result.getStatus());
                 Assertions.assertEquals(uuid.toString(), result.getEntity().getUuid());
             })
             .verifyComplete();

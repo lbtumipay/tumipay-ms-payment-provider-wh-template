@@ -1,11 +1,11 @@
 package com.tumipay.microservice.domain.service.implementation;
 
-import com.tumipay.microservice.domain.component.enums.OperationStatusEnum;
 import com.tumipay.microservice.domain.component.enums.PaymentMethodEnum;
 import com.tumipay.microservice.domain.component.enums.TransactionTypeEnum;
 import com.tumipay.microservice.domain.model.provider.ProviderIntegrationLog;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.entity.ProviderIntegrationLogEntity;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.repository.IProviderIntegrationLogRepository;
+import com.tumipay.microservice.shared.enums.BaseOperationStatusEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,7 +71,7 @@ class ProviderIntegrationLogDomainServiceIntegrationTest {
             .build();
 
         StepVerifier.create(providerIntegrationLogDomainService.saveDomainEntity(log))
-            .assertNext(result -> Assertions.assertEquals(OperationStatusEnum.SUCCESS, result.getStatus()))
+            .assertNext(result -> Assertions.assertEquals(BaseOperationStatusEnum.SUCCESS, result.getStatus()))
             .verifyComplete();
 
         ProviderIntegrationLogEntity persisted = providerIntegrationLogRepository.findByIdempotencyKey(idempotencyKey).block();
@@ -107,7 +107,7 @@ class ProviderIntegrationLogDomainServiceIntegrationTest {
 
         StepVerifier.create(providerIntegrationLogDomainService.getDomainEntityByUuId(uuid))
             .assertNext(result -> {
-                Assertions.assertEquals(OperationStatusEnum.SUCCESS, result.getStatus());
+                Assertions.assertEquals(BaseOperationStatusEnum.SUCCESS, result.getStatus());
                 Assertions.assertEquals(uuid, result.getEntity().getUuid());
             })
             .verifyComplete();

@@ -1,9 +1,9 @@
 package com.tumipay.microservice.domain.service.implementation;
 
-import com.tumipay.microservice.domain.component.enums.OperationStatusEnum;
 import com.tumipay.microservice.domain.component.enums.TransactionTypeEnum;
 import com.tumipay.microservice.domain.model.provider.ProviderIntegrationLog;
 import com.tumipay.microservice.domain.port.output.IProviderIntegrationLogRepositoryPort;
+import com.tumipay.microservice.shared.enums.BaseOperationStatusEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -69,7 +69,7 @@ class ProviderIntegrationLogDomainServiceTest {
     void getDomainEntityByUuId_blankUuid_shouldReturnFailure() {
         StepVerifier.create(service.getDomainEntityByUuId("  "))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("entityUuId is required and cannot be empty", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -78,7 +78,7 @@ class ProviderIntegrationLogDomainServiceTest {
     void getDomainEntityByUuId_invalidUuidFormat_shouldReturnFailure() {
         StepVerifier.create(service.getDomainEntityByUuId("not-valid"))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("entityUuId format is invalid", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -90,7 +90,7 @@ class ProviderIntegrationLogDomainServiceTest {
         entity.setUuid(uuid);
         when(repositoryPort.findByUuid(uuid)).thenReturn(Mono.just(entity));
         StepVerifier.create(service.getDomainEntityByUuId(uuid))
-            .assertNext(r -> assertEquals(OperationStatusEnum.SUCCESS, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.SUCCESS, r.getStatus()))
             .verifyComplete();
     }
 
@@ -100,7 +100,7 @@ class ProviderIntegrationLogDomainServiceTest {
         when(repositoryPort.findByUuid(uuid)).thenReturn(Mono.empty());
         StepVerifier.create(service.getDomainEntityByUuId(uuid))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("ProviderIntegrationLog not found for uuid=" + uuid, r.getErrorMessage());
             }).verifyComplete();
     }
@@ -111,7 +111,7 @@ class ProviderIntegrationLogDomainServiceTest {
         when(repositoryPort.findByUuid(uuid)).thenReturn(Mono.error(new RuntimeException("db error")));
         StepVerifier.create(service.getDomainEntityByUuId(uuid))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("Error getting ProviderIntegrationLog: db error", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -141,7 +141,7 @@ class ProviderIntegrationLogDomainServiceTest {
         ProviderIntegrationLog entity = validCreateEntity();
         when(repositoryPort.save(any())).thenReturn(Mono.just(entity));
         StepVerifier.create(service.saveDomainEntity(entity))
-            .assertNext(r -> assertEquals(OperationStatusEnum.SUCCESS, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.SUCCESS, r.getStatus()))
             .verifyComplete();
     }
 
@@ -181,7 +181,7 @@ class ProviderIntegrationLogDomainServiceTest {
         ProviderIntegrationLog entity = validUpdateEntity();
         when(repositoryPort.update(any())).thenReturn(Mono.just(entity));
         StepVerifier.create(service.updateDomainEntity(entity))
-            .assertNext(r -> assertEquals(OperationStatusEnum.SUCCESS, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.SUCCESS, r.getStatus()))
             .verifyComplete();
     }
 }

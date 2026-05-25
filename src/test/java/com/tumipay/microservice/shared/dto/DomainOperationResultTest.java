@@ -1,6 +1,6 @@
 package com.tumipay.microservice.shared.dto;
 
-import com.tumipay.microservice.domain.component.enums.OperationStatusEnum;
+import com.tumipay.microservice.shared.enums.BaseOperationStatusEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -23,7 +23,7 @@ class DomainOperationResultTest {
         DomainOperationResult<String> result = DomainOperationResult.success("OK");
 
         assertNotNull(result);
-        assertEquals(OperationStatusEnum.SUCCESS, result.getStatus());
+        assertEquals(BaseOperationStatusEnum.SUCCESS, result.getStatus());
         assertEquals("OK", result.getEntity());
         assertNull(result.getErrorMessage());
         assertNotNull(result.getErrors());
@@ -35,7 +35,7 @@ class DomainOperationResultTest {
     void failureWithMessage_shouldReturnFailedStatus() {
         DomainOperationResult<String> result = DomainOperationResult.failure("validation failed");
 
-        assertEquals(OperationStatusEnum.FAILED, result.getStatus());
+        assertEquals(BaseOperationStatusEnum.FAILED, result.getStatus());
         assertEquals("validation failed", result.getErrorMessage());
         assertNull(result.getEntity());
         assertNotNull(result.getErrors());
@@ -49,7 +49,7 @@ class DomainOperationResultTest {
 
         DomainOperationResult<String> result = DomainOperationResult.failure("invalid payload", errors);
 
-        assertEquals(OperationStatusEnum.FAILED, result.getStatus());
+        assertEquals(BaseOperationStatusEnum.FAILED, result.getStatus());
         assertEquals("invalid payload", result.getErrorMessage());
         assertEquals(errors, result.getErrors());
         assertTrue(result.isFailed());
@@ -71,13 +71,13 @@ class DomainOperationResultTest {
         List<String> errors = List.of("e1", "e2");
 
         DomainOperationResult<String> result = DomainOperationResult.<String>builder()
-            .status(OperationStatusEnum.FAILED)
+            .status(BaseOperationStatusEnum.FAILED)
             .errorMessage("builder error")
             .errors(errors)
             .entity("entity-x")
             .build();
 
-        assertEquals(OperationStatusEnum.FAILED, result.getStatus());
+        assertEquals(BaseOperationStatusEnum.FAILED, result.getStatus());
         assertEquals("builder error", result.getErrorMessage());
         assertEquals(errors, result.getErrors());
         assertEquals("entity-x", result.getEntity());

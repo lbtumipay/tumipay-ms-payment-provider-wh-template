@@ -1,12 +1,12 @@
 package com.tumipay.microservice.domain.service.implementation;
 
-import com.tumipay.microservice.domain.component.enums.OperationStatusEnum;
 import com.tumipay.microservice.domain.component.enums.PaymentMethodEnum;
 import com.tumipay.microservice.domain.component.enums.TransactionStatusEnum;
 import com.tumipay.microservice.domain.component.enums.TransactionTypeEnum;
 import com.tumipay.microservice.domain.model.provider.ProviderTransaction;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.entity.ProviderTransactionEntity;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.repository.IProviderTransactionRepository;
+import com.tumipay.microservice.shared.enums.BaseOperationStatusEnum;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,7 +68,7 @@ class ProviderTransactionDomainServiceIntegrationTest {
             .build();
 
         StepVerifier.create(providerTransactionDomainService.saveDomainEntity(domainEntity))
-            .assertNext(result -> Assertions.assertEquals(OperationStatusEnum.SUCCESS, result.getStatus()))
+            .assertNext(result -> Assertions.assertEquals(BaseOperationStatusEnum.SUCCESS, result.getStatus()))
             .verifyComplete();
 
         ProviderTransactionEntity persisted = providerTransactionRepository.findByIdempotencyKey(idempotencyKey).block();
@@ -98,7 +98,7 @@ class ProviderTransactionDomainServiceIntegrationTest {
 
         StepVerifier.create(providerTransactionDomainService.validateIdempotency(idempotencyKey))
             .assertNext(result -> {
-                Assertions.assertEquals(OperationStatusEnum.FAILED, result.getStatus());
+                Assertions.assertEquals(BaseOperationStatusEnum.FAILED, result.getStatus());
                 Assertions.assertTrue(result.getErrorMessage().contains("Duplicate transaction detected"));
             })
             .verifyComplete();
@@ -125,7 +125,7 @@ class ProviderTransactionDomainServiceIntegrationTest {
 
         StepVerifier.create(providerTransactionDomainService.getDomainEntityByUuId(uuid))
             .assertNext(result -> {
-                Assertions.assertEquals(OperationStatusEnum.SUCCESS, result.getStatus());
+                Assertions.assertEquals(BaseOperationStatusEnum.SUCCESS, result.getStatus());
                 Assertions.assertEquals(uuid, result.getEntity().getUuid());
             })
             .verifyComplete();

@@ -1,6 +1,5 @@
 package com.tumipay.microservice.shared.dto;
 
-import com.tumipay.microservice.domain.component.enums.OperationStatusEnum;
 import com.tumipay.microservice.shared.enums.BaseOperationStatusEnum;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -111,6 +110,22 @@ class CommonValidationResultTest {
         assertEquals("multi-error", result.getErrorMessage());
         assertEquals(2, result.getErrors().size());
         assertTrue(result.getErrors().contains("field amount required"));
+        assertNotNull(result.getValidationErrors());
+        assertTrue(result.getValidationErrors().isEmpty());
+    }
+
+    @Test
+    @DisplayName("failure(errorCode, errorMessage) - should return FAILED status and set error code")
+    void failure_errorCodeAndMessage_shouldReturnFailedStatusWithErrorCode() {
+        CommonValidationResult result = CommonValidationResult.failure("ERR-001", "validation error");
+
+        assertEquals(BaseOperationStatusEnum.FAILED, result.getStatus());
+        assertEquals("ERR-001", result.getErrorCode());
+        assertEquals("validation error", result.getErrorMessage());
+        assertNotNull(result.getErrors());
+        assertTrue(result.getErrors().isEmpty());
+        assertNotNull(result.getValidationErrors());
+        assertTrue(result.getValidationErrors().isEmpty());
     }
 
     @Test
@@ -235,129 +250,5 @@ class CommonValidationResultTest {
             java.io.Serializable.class,
             CommonValidationResult.success()
         );
-    }
-}
-
-@DisplayName("DomainValidationResult Unit Tests")
-class DomainValidationResultTest {
-
-    @Test
-    @DisplayName("success - should return SUCCESS status and empty errors")
-    void success_shouldReturnSuccessStatus() {
-        DomainValidationResult result = DomainValidationResult.success();
-
-        assertNotNull(result);
-        assertEquals(OperationStatusEnum.SUCCESS, result.getStatus());
-        assertNull(result.getErrorMessage());
-        assertNotNull(result.getErrors());
-        assertTrue(result.getErrors().isEmpty());
-        assertNotNull(result.getValidationErrors());
-        assertTrue(result.getValidationErrors().isEmpty());
-        assertTrue(result.isSuccess());
-        assertFalse(result.isFailed());
-    }
-
-    @Test
-    @DisplayName("failure(message) - should return FAILED status with message")
-    void failureWithMessage_shouldReturnFailedStatus() {
-        DomainValidationResult result = DomainValidationResult.failure("generic failure");
-
-        assertEquals(OperationStatusEnum.FAILED, result.getStatus());
-        assertEquals("generic failure", result.getErrorMessage());
-        assertNotNull(result.getErrors());
-        assertTrue(result.getErrors().isEmpty());
-        assertNotNull(result.getValidationErrors());
-        assertTrue(result.getValidationErrors().isEmpty());
-        assertTrue(result.isFailed());
-        assertFalse(result.isSuccess());
-    }
-
-    @Test
-    @DisplayName("failure(message, errors) - should keep detailed string errors")
-    void failureWithMessageAndErrors_shouldKeepDetailedErrors() {
-        List<String> errors = List.of("field amount required", "field currency invalid");
-
-        CommonValidationResult result = CommonValidationResult.failure("validation failed", errors);
-
-        assertEquals(BaseOperationStatusEnum.FAILED, result.getStatus());
-        assertEquals("validation failed", result.getErrorMessage());
-        assertEquals(errors, result.getErrors());
-        assertNotNull(result.getValidationErrors());
-        assertTrue(result.getValidationErrors().isEmpty());
-    }
-
-    @Test
-    @DisplayName("failures(message, validationErrors) - should keep structured validation errors")
-    void failuresWithValidationErrors_shouldKeepStructuredErrors() {
-        List<ValidationError> validationErrors = List.of(
-            ValidationError.builder().field("amount").message("required").build(),
-            ValidationError.builder().field("currency").message("invalid").build()
-        );
-
-        CommonValidationResult result = CommonValidationResult.failures("validation failed", validationErrors);
-
-        assertEquals(BaseOperationStatusEnum.FAILED, result.getStatus());
-        assertEquals("validation failed", result.getErrorMessage());
-        assertNotNull(result.getErrors());
-        assertTrue(result.getErrors().isEmpty());
-        assertEquals(validationErrors, result.getValidationErrors());
-    }
-
-    @Test
-    @DisplayName("failure/failures - should support empty lists")
-    void failureMethods_shouldSupportEmptyLists() {
-        CommonValidationResult stringErrorsResult = CommonValidationResult.failure("no details", Collections.emptyList());
-        CommonValidationResult validationErrorsResult = CommonValidationResult.failures("no details", Collections.emptyList());
-
-        assertTrue(stringErrorsResult.getErrors().isEmpty());
-        assertTrue(validationErrorsResult.getValidationErrors().isEmpty());
-    }
-
-    @Test
-    @DisplayName("builder - should build instance with explicit values")
-    void builder_shouldBuildWithExplicitValues() {
-        List<String> errors = List.of("e1", "e2");
-        List<ValidationError> validationErrors = List.of(
-            ValidationError.builder().field("email").message("invalid format").build()
-        );
-
-        CommonValidationResult result = CommonValidationResult.builder()
-            .status(OperationStatusEnum.FAILED)
-            .errorMessage("builder error")
-            .errors(errors)
-            .validationErrors(validationErrors)
-            .build();
-
-        assertEquals(OperationStatusEnum.FAILED, result.getStatus());
-        assertEquals("builder error", result.getErrorMessage());
-        assertEquals(errors, result.getErrors());
-        assertEquals(validationErrors, result.getValidationErrors());
-    }
-
-    @Test
-    @DisplayName("noArgsConstructor - should create empty instance")
-    void noArgsConstructor_shouldCreateEmptyInstance() {
-        DomainValidationResult result = new DomainValidationResult();
-
-        assertNotNull(result);
-        assertNull(result.getStatus());
-        assertNull(result.getErrorMessage());
-        assertNotNull(result.getValidationErrors());
-        assertTrue(result.getValidationErrors().isEmpty());
-    }
-
-    @Test
-    @DisplayName("isSuccess/isFailed - should return false when status is null")
-    void statusChecks_shouldReturnFalseWhenStatusIsNull() {
-        DomainValidationResult result = new DomainValidationResult();
-
-        assertFalse(result.isSuccess());
-        assertFalse(result.isFailed());
-    }
-
-    @Test
-    @DisplayName("should implement Serializable")
-    void shouldImplementSerializable() {
-        assertInstanceOf(java.io.Serializable.class, DomainValidationResult.success());
     }
 }

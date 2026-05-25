@@ -1,6 +1,5 @@
 package com.tumipay.microservice.domain.service.implementation;
 
-import com.tumipay.microservice.domain.component.enums.OperationStatusEnum;
 import com.tumipay.microservice.domain.model.provider.ProviderTransaction;
 import com.tumipay.microservice.domain.model.transaction.StandardTransactionResult;
 import com.tumipay.microservice.domain.port.output.IAdapterTransactionRepositoryPort;
@@ -110,7 +109,7 @@ public class ProviderTransactionDomainService implements IProviderTransactionDom
 
         if (CommonStringUtils.isBlank(idempotencyKey)) {
             return Mono.just(DomainOperationResult.<Void>builder()
-                .status(OperationStatusEnum.FAILED)
+                .status(BaseOperationStatusEnum.FAILED)
                 .errorMessage("idempotencyKey is required and cannot be empty")
                 .build());
         }
@@ -119,20 +118,20 @@ public class ProviderTransactionDomainService implements IProviderTransactionDom
             .flatMap(existingTransaction -> {
                 log.warn("Duplicate idempotency detected for idempotencyKey={}", idempotencyKey);
                 return Mono.just(DomainOperationResult.<Void>builder()
-                    .status(OperationStatusEnum.FAILED)
+                    .status(BaseOperationStatusEnum.FAILED)
                     .errorMessage("Duplicate transaction detected for idempotency_key " + idempotencyKey)
                     .build());
             })
             .switchIfEmpty(Mono.defer(() -> {
                 log.debug("No duplicate found for idempotencyKey={}", idempotencyKey);
                 return Mono.just(DomainOperationResult.<Void>builder()
-                    .status(OperationStatusEnum.SUCCESS)
+                    .status(BaseOperationStatusEnum.SUCCESS)
                     .build());
             }))
             .onErrorResume(error -> {
                 log.error("Error validating idempotency for idempotencyKey={}, error={}", idempotencyKey, error.getMessage(), error);
                 return Mono.just(DomainOperationResult.<Void>builder()
-                    .status(OperationStatusEnum.FAILED)
+                    .status(BaseOperationStatusEnum.FAILED)
                     .errorMessage("Error validating idempotency: " + error.getMessage())
                     .build());
             })
@@ -169,7 +168,7 @@ public class ProviderTransactionDomainService implements IProviderTransactionDom
 
     private Mono<DomainOperationResult<ProviderTransaction>> monoDomainSuccess(ProviderTransaction providerTransaction) {
         return Mono.just(DomainOperationResult.<ProviderTransaction>builder()
-            .status(OperationStatusEnum.SUCCESS)
+            .status(BaseOperationStatusEnum.SUCCESS)
             .entity(providerTransaction)
             .build()
         );
@@ -177,7 +176,7 @@ public class ProviderTransactionDomainService implements IProviderTransactionDom
 
     private Mono<DomainOperationResult<ProviderTransaction>> monoDomainFailure(String errorMessage) {
         return Mono.just(DomainOperationResult.<ProviderTransaction>builder()
-            .status(OperationStatusEnum.FAILED)
+            .status(BaseOperationStatusEnum.FAILED)
             .errorMessage(errorMessage)
             .build()
         );

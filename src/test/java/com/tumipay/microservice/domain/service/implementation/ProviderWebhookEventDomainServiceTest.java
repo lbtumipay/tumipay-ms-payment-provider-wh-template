@@ -1,10 +1,10 @@
 package com.tumipay.microservice.domain.service.implementation;
 
-import com.tumipay.microservice.domain.component.enums.OperationStatusEnum;
 import com.tumipay.microservice.domain.component.enums.WebhookProcessingStatusEnum;
 import com.tumipay.microservice.domain.model.webhook.WebhookEvent;
 import com.tumipay.microservice.domain.port.output.IProviderWebhookEventRepositoryPort;
 import com.tumipay.microservice.domain.port.output.IWebhookWorkerRepositoryPort;
+import com.tumipay.microservice.shared.enums.BaseOperationStatusEnum;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -70,7 +70,7 @@ class ProviderWebhookEventDomainServiceTest {
     void getDomainEntityByUuId_blankUuid_shouldReturnFailure() {
         StepVerifier.create(service.getDomainEntityByUuId(""))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("entityUuId is required and cannot be empty", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -78,7 +78,7 @@ class ProviderWebhookEventDomainServiceTest {
     void getDomainEntityByUuId_invalidUuidFormat_shouldReturnFailure() {
         StepVerifier.create(service.getDomainEntityByUuId("not-a-valid-uuid"))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("entityUuId format is invalid", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -89,7 +89,7 @@ class ProviderWebhookEventDomainServiceTest {
         entity.setUuid(uuid.toString());
         when(repositoryPort.findByUuid(uuid)).thenReturn(Mono.just(entity));
         StepVerifier.create(service.getDomainEntityByUuId(uuid.toString()))
-            .assertNext(r -> assertEquals(OperationStatusEnum.SUCCESS, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.SUCCESS, r.getStatus()))
             .verifyComplete();
     }
     @Test
@@ -98,7 +98,7 @@ class ProviderWebhookEventDomainServiceTest {
         when(repositoryPort.findByUuid(uuid)).thenReturn(Mono.empty());
         StepVerifier.create(service.getDomainEntityByUuId(uuid.toString()))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("ProviderWebhookEvent not found for uuid=" + uuid, r.getErrorMessage());
             }).verifyComplete();
     }
@@ -108,7 +108,7 @@ class ProviderWebhookEventDomainServiceTest {
         when(repositoryPort.findByUuid(uuid)).thenReturn(Mono.error(new RuntimeException("db error")));
         StepVerifier.create(service.getDomainEntityByUuId(uuid.toString()))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("Error getting ProviderWebhookEvent: db error", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -116,7 +116,7 @@ class ProviderWebhookEventDomainServiceTest {
     @Test
     void saveDomainEntity_nullEntity_shouldReturnFailure() {
         StepVerifier.create(service.saveDomainEntity(null))
-            .assertNext(r -> assertEquals(OperationStatusEnum.FAILED, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus()))
             .verifyComplete();
     }
     @Test
@@ -127,7 +127,7 @@ class ProviderWebhookEventDomainServiceTest {
             .eventRequest("{\"status\":\"PENDING\"}")
             .build(); // missing adapterProviderCode
         StepVerifier.create(service.saveDomainEntity(invalid))
-            .assertNext(r -> assertEquals(OperationStatusEnum.FAILED, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus()))
             .verifyComplete();
     }
     @Test
@@ -138,7 +138,7 @@ class ProviderWebhookEventDomainServiceTest {
             .eventRequest("{\"status\":\"PENDING\"}")
             .build(); // missing processingStatus
         StepVerifier.create(service.saveDomainEntity(invalid))
-            .assertNext(r -> assertEquals(OperationStatusEnum.FAILED, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus()))
             .verifyComplete();
     }
     @Test
@@ -146,7 +146,7 @@ class ProviderWebhookEventDomainServiceTest {
         WebhookEvent entity = validCreateEntity();
         when(repositoryPort.save(any())).thenReturn(Mono.just(entity));
         StepVerifier.create(service.saveDomainEntity(entity))
-            .assertNext(r -> assertEquals(OperationStatusEnum.SUCCESS, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.SUCCESS, r.getStatus()))
             .verifyComplete();
     }
     @Test
@@ -155,7 +155,7 @@ class ProviderWebhookEventDomainServiceTest {
         when(repositoryPort.save(any())).thenReturn(Mono.error(new RuntimeException("save error")));
         StepVerifier.create(service.saveDomainEntity(entity))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("Error saving ProviderWebhookEvent: save error", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -163,7 +163,7 @@ class ProviderWebhookEventDomainServiceTest {
     @Test
     void updateDomainEntity_nullEntity_shouldReturnFailure() {
         StepVerifier.create(service.updateDomainEntity(null))
-            .assertNext(r -> assertEquals(OperationStatusEnum.FAILED, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus()))
             .verifyComplete();
     }
 
@@ -174,7 +174,7 @@ class ProviderWebhookEventDomainServiceTest {
             .processingStatus(WebhookProcessingStatusEnum.PROCESSED)
             .build();
         StepVerifier.create(service.updateDomainEntity(invalid))
-            .assertNext(r -> assertEquals(OperationStatusEnum.FAILED, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus()))
             .verifyComplete();
     }
 
@@ -184,7 +184,7 @@ class ProviderWebhookEventDomainServiceTest {
             .uuid(UUID.randomUUID().toString())
             .build(); // missing processingStatus
         StepVerifier.create(service.updateDomainEntity(invalid))
-            .assertNext(r -> assertEquals(OperationStatusEnum.FAILED, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus()))
             .verifyComplete();
     }
 
@@ -193,7 +193,7 @@ class ProviderWebhookEventDomainServiceTest {
         WebhookEvent entity = validUpdateEntity();
         when(repositoryPort.update(any())).thenReturn(Mono.just(entity));
         StepVerifier.create(service.updateDomainEntity(entity))
-            .assertNext(r -> assertEquals(OperationStatusEnum.SUCCESS, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.SUCCESS, r.getStatus()))
             .verifyComplete();
     }
 
@@ -203,7 +203,7 @@ class ProviderWebhookEventDomainServiceTest {
         when(repositoryPort.update(any())).thenReturn(Mono.error(new RuntimeException("update error")));
         StepVerifier.create(service.updateDomainEntity(entity))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("Error updating ProviderWebhookEvent: update error", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -212,7 +212,7 @@ class ProviderWebhookEventDomainServiceTest {
     void validateIdempotency_blankKey_shouldReturnFailure() {
         StepVerifier.create(service.validateIdempotency("  "))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("idempotencyKey is required and cannot be empty", r.getErrorMessage());
             }).verifyComplete();
     }
@@ -222,7 +222,7 @@ class ProviderWebhookEventDomainServiceTest {
         String key = UUID.randomUUID().toString();
         when(repositoryPort.findByIdempotencyKey(key)).thenReturn(Mono.empty());
         StepVerifier.create(service.validateIdempotency(key))
-            .assertNext(r -> assertEquals(OperationStatusEnum.SUCCESS, r.getStatus()))
+            .assertNext(r -> assertEquals(BaseOperationStatusEnum.SUCCESS, r.getStatus()))
             .verifyComplete();
     }
 
@@ -233,7 +233,7 @@ class ProviderWebhookEventDomainServiceTest {
             .thenReturn(Mono.error(new RuntimeException("idempotency error")));
         StepVerifier.create(service.validateIdempotency(key))
             .assertNext(r -> {
-                assertEquals(OperationStatusEnum.FAILED, r.getStatus());
+                assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus());
                 assertEquals("Error validating idempotency: idempotency error", r.getErrorMessage());
             }).verifyComplete();
     }

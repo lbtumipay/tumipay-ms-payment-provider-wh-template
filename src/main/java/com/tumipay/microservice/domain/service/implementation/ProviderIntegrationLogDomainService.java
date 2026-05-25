@@ -4,7 +4,6 @@ import com.tumipay.microservice.domain.model.provider.ProviderIntegrationLog;
 import com.tumipay.microservice.domain.port.output.IProviderIntegrationLogRepositoryPort;
 import com.tumipay.microservice.domain.service.contract.IProviderIntegrationLogDomainService;
 import com.tumipay.microservice.shared.dto.CommonValidationResult;
-import com.tumipay.microservice.domain.component.enums.OperationStatusEnum;
 import com.tumipay.microservice.shared.dto.DomainOperationResult;
 import com.tumipay.microservice.shared.enums.BaseOperationStatusEnum;
 import com.tumipay.microservice.shared.util.CommonErrorUtils;
@@ -111,7 +110,7 @@ public class ProviderIntegrationLogDomainService implements IProviderIntegration
 
     private Mono<DomainOperationResult<ProviderIntegrationLog>> monoDomainSuccess(ProviderIntegrationLog providerIntegrationLog) {
         return Mono.just(DomainOperationResult.<ProviderIntegrationLog>builder()
-            .status(OperationStatusEnum.SUCCESS)
+            .status(BaseOperationStatusEnum.SUCCESS)
             .entity(providerIntegrationLog)
             .build()
         );
@@ -119,7 +118,7 @@ public class ProviderIntegrationLogDomainService implements IProviderIntegration
 
     private Mono<DomainOperationResult<ProviderIntegrationLog>> monoDomainFailure(String errorMessage) {
         return Mono.just(DomainOperationResult.<ProviderIntegrationLog>builder()
-            .status(OperationStatusEnum.FAILED)
+            .status(BaseOperationStatusEnum.FAILED)
             .errorMessage(errorMessage)
             .build()
         );
