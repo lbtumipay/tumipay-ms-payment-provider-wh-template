@@ -104,6 +104,11 @@ public enum BaseErrorCodeEnum {
     CACHE_ERROR("CACHE_ERROR", "Cache operation failed"),
 
     /**
+     * Enum representing a timeout error code when communicating with the provider.
+     */
+    TUMIPAY_PAYMENT_GATEWAY_ERROR("TUMIPAY_PAYMENT_GATEWAY_ERROR", "The provider did not respond in time"),
+
+    /**
      * Enum representing a duplicate webhook event error code.
      */
     DUPLICATE_WEBHOOK_EVENT("DUPLICATE_WEBHOOK_EVENT", "A webhook event with this idempotency key has already been processed"),

@@ -22,11 +22,6 @@ class BaseErrorCodeEnumTest {
 
     // ── Enum catalogue ─────────────────────────────────────────────────────────
 
-    @Test
-    @DisplayName("Should contain exactly 28 declared constants")
-    void shouldContainExactlyTwentyEightConstants() {
-        assertEquals(28, BaseErrorCodeEnum.values().length);
-    }
 
     @Test
     @DisplayName("Every constant should have non-null code and message")

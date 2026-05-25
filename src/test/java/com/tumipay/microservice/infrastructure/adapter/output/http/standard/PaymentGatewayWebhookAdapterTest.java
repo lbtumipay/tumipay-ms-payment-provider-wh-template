@@ -2,6 +2,8 @@ package com.tumipay.microservice.infrastructure.adapter.output.http.standard;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.tumipay.microservice.domain.model.webhook.WebhookEvent;
+import com.tumipay.microservice.infrastructure.adapter.output.http.standard.mapper.IGatewayWebhookMapper;
+import com.tumipay.microservice.infrastructure.adapter.output.http.standard.request.GatewayWebhookRequest;
 import com.tumipay.microservice.infrastructure.adapter.output.http.standard.response.GatewayWebhookResponse;
 import com.tumipay.microservice.infrastructure.component.constant.BaseIntegrationConstant;
 import com.tumipay.microservice.infrastructure.component.http.dto.ClientHttpRequest;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mapstruct.factory.Mappers;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -20,6 +23,7 @@ import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.TimeoutException;
 
@@ -85,6 +89,8 @@ class PaymentGatewayWebhookAdapterTest {
 
     @BeforeEach
     void mockGatewayProperties() {
+        IGatewayWebhookMapper gatewayWebhookMapper = Mappers.getMapper(IGatewayWebhookMapper.class);
+
         when(paymentGatewayProperties.getBaseUrl()).thenReturn(GATEWAY_BASE_URL);
         when(paymentGatewayProperties.getApiKey()).thenReturn(GATEWAY_API_KEY);
         when(paymentGatewayProperties.getEndpoints()).thenReturn(gatewayEndpoints);
@@ -93,7 +99,8 @@ class PaymentGatewayWebhookAdapterTest {
 
         adapter = new PaymentGatewayWebhookAdapter(
             paymentGatewayProperties,
-            httpClientExecutor
+            httpClientExecutor,
+            gatewayWebhookMapper
         );
     }
 
@@ -221,7 +228,7 @@ class PaymentGatewayWebhookAdapterTest {
                 assertEquals("DUPLICATE_EVENT", response.getCode());
                 assertEquals("FAILED", response.getStatus());
                 assertNull(response.getData());
-                assertNotNull(response.getMessage());
+                assertEquals("Duplicate event — already acknowledged by Gateway", response.getMessage());
             })
             .verifyComplete();
     }
@@ -289,7 +296,7 @@ class PaymentGatewayWebhookAdapterTest {
         StepVerifier.create(adapter.dispatchWebhookEvent(buildWebhookEvent()))
             .expectErrorSatisfies(error -> {
                 assertInstanceOf(GatewayWebhookException.class, error);
-                assertEquals("GATEWAY_TIMEOUT", ((GatewayWebhookException) error).getCode());
+                assertEquals("TUMIPAY_PAYMENT_GATEWAY_ERROR", ((GatewayWebhookException) error).getCode());
             })
             .verify();
     }
@@ -318,7 +325,7 @@ class PaymentGatewayWebhookAdapterTest {
         assertNotNull(capturedRequest.getConfigIntegration());
         assertEquals(GATEWAY_BASE_URL, capturedRequest.getConfigIntegration().getHost());
         assertEquals(WEBHOOK_PATH, capturedRequest.getConfigIntegration().getIntegrationPath());
-        assertEquals("TUMIPAY_PAYMENT_GATEWAY_WEBHOOK", capturedRequest.getConfigIntegration().getIntegrationCode());
+        assertEquals("tumipay-payment-gateway-webhook-dispatch", capturedRequest.getConfigIntegration().getIntegrationCode());
         assertEquals(5_000L, capturedRequest.getConfigIntegration().getTimeout().toMillis());
         assertEquals(IDEMPOTENCY_KEY, capturedRequest.getRequestId());
         assertEquals(EVENT_UUID, capturedRequest.getIntegrationId());
@@ -328,6 +335,17 @@ class PaymentGatewayWebhookAdapterTest {
         assertEquals(IDEMPOTENCY_KEY, capturedRequest.getHeaders().getFirst(BaseIntegrationConstant.HEADER_IDEMPOTENCY_KEY));
         assertEquals(GATEWAY_API_KEY, capturedRequest.getHeaders().getFirst(BaseIntegrationConstant.HEADER_API_KEY));
         assertEquals(PROVIDER_CODE, capturedRequest.getHeaders().getFirst(BaseIntegrationConstant.HEADER_ADAPTER_PROVIDER_CODE));
+
+        assertInstanceOf(GatewayWebhookRequest.class, capturedRequest.getBody());
+
+        GatewayWebhookRequest body = (GatewayWebhookRequest) capturedRequest.getBody();
+        assertEquals(EVENT_UUID, body.getEventId());
+        assertEquals("PAYIN_TRANSACTION_APPROVED", body.getEventType());
+        assertEquals(PROVIDER_CODE, body.getAdapterProviderCode());
+        assertEquals(Instant.parse("2026-04-14T10:30:00Z"), body.getReceivedAt());
+        assertInstanceOf(Map.class, body.getEventRequest());
+        assertEquals("APPROVED", ((Map<?, ?>) body.getEventRequest()).get("status"));
+        assertEquals(150000.0, ((Map<?, ?>) body.getEventRequest()).get("amount"));
     }
 }
 
