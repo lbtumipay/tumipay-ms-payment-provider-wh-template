@@ -3,6 +3,7 @@ package com.tumipay.microservice.infrastructure.adapter.output.persistence;
 import com.tumipay.microservice.domain.model.webhook.WebhookEvent;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.entity.ProviderWebhookEventEntity;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.mapper.IProviderWebhookEventPersistenceMapper;
+import com.tumipay.microservice.infrastructure.adapter.output.persistence.mapper.ProviderWebhookEventMapperComponent;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.repository.IProviderWebhookEventR2dbcRepository;
 import com.tumipay.microservice.shared.properties.WebhookDispatcherProperties;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +45,7 @@ import static org.mockito.Mockito.*;
 class WebhookWorkerRepositoryAdapterTest {
 
     @Mock private DatabaseClient databaseClient;
+    @Mock private ProviderWebhookEventMapperComponent providerWebhookEventMapperComponent;
     @Mock private IProviderWebhookEventPersistenceMapper webhookEventPersistenceMapper;
     @Mock private WebhookDispatcherProperties webhookDispatcherProperties;
     @Mock private IProviderWebhookEventR2dbcRepository webhookEventRepository;
@@ -57,10 +59,11 @@ class WebhookWorkerRepositoryAdapterTest {
     @BeforeEach
     void setUp() {
         adapter = new WebhookWorkerRepositoryAdapter(
-            databaseClient,
+            webhookEventRepository,
+            providerWebhookEventMapperComponent,
             webhookEventPersistenceMapper,
             webhookDispatcherProperties,
-            webhookEventRepository
+            databaseClient
         );
     }
 
@@ -78,6 +81,7 @@ class WebhookWorkerRepositoryAdapterTest {
         when(executeSpec.bind(anyString(), any())).thenReturn(executeSpec);
         when(executeSpec.fetch()).thenReturn(fetchSpec);
         when(fetchSpec.all()).thenReturn(Flux.just(row));
+        when(providerWebhookEventMapperComponent.mapRowToEntity(row)).thenReturn(buildEntity(1L));
         when(webhookEventPersistenceMapper.toDomain(any(ProviderWebhookEventEntity.class))).thenReturn(domain);
 
         StepVerifier.create(adapter.claimBatch("worker-1", 10))
@@ -86,6 +90,7 @@ class WebhookWorkerRepositoryAdapterTest {
 
         verify(databaseClient).sql(anyString());
         verify(executeSpec, atLeast(2)).bind(anyString(), any());
+        verify(providerWebhookEventMapperComponent).mapRowToEntity(row);
         verify(webhookEventPersistenceMapper).toDomain(any(ProviderWebhookEventEntity.class));
     }
 
@@ -153,6 +158,7 @@ class WebhookWorkerRepositoryAdapterTest {
         when(executeSpec.bind(anyString(), any())).thenReturn(executeSpec);
         when(executeSpec.fetch()).thenReturn(fetchSpec);
         when(fetchSpec.all()).thenReturn(Flux.just(row));
+        when(providerWebhookEventMapperComponent.mapRowToEntity(row)).thenReturn(buildEntity(2L));
         when(webhookEventPersistenceMapper.toDomain(any(ProviderWebhookEventEntity.class))).thenReturn(domain);
 
         StepVerifier.create(adapter.claimBatch("worker-1", 5))
@@ -378,6 +384,7 @@ class WebhookWorkerRepositoryAdapterTest {
         when(executeSpec.bind(anyString(), any())).thenReturn(executeSpec);
         when(executeSpec.fetch()).thenReturn(fetchSpec);
         when(fetchSpec.all()).thenReturn(Flux.just(row));
+        when(providerWebhookEventMapperComponent.mapRowToEntity(row)).thenReturn(buildEntity(50L));
         when(webhookEventPersistenceMapper.toDomain(any(ProviderWebhookEventEntity.class))).thenReturn(domain);
 
         StepVerifier.create(adapter.findReceivedBatch(5))

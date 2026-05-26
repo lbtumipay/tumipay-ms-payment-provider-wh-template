@@ -2,6 +2,7 @@ package com.tumipay.microservice.domain.service.implementation;
 
 import com.tumipay.microservice.domain.component.enums.TransactionStatusEnum;
 import com.tumipay.microservice.domain.component.enums.WebhookEventTypeEnum;
+import com.tumipay.microservice.domain.component.mapper.WebhookEventMapperComponent;
 import com.tumipay.microservice.domain.model.webhook.WebhookClassifierResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -29,7 +30,7 @@ class ProviderWebhookEventClassifierServiceTest {
 
     @BeforeEach
     void setUp() {
-        classifier = new ProviderWebhookEventClassifierService();
+        classifier = new ProviderWebhookEventClassifierService(new WebhookEventMapperComponent());
     }
 
     // ── Null / blank input ────────────────────────────────────────────────────

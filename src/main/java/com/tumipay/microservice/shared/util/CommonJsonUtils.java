@@ -3,7 +3,6 @@ package com.tumipay.microservice.shared.util;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import lombok.experimental.UtilityClass;
-
 import java.lang.reflect.Type;
 import java.time.Instant;
 import java.util.List;
@@ -18,10 +17,20 @@ import java.util.Objects;
  * <p>
  * This helper enforces the official JSON contract defined by TumiPay, ensuring:
  * <ul>
- *   <li>Consistent {@code snake_case} field naming</li>
- *   <li>Explicit serialization of {@code null} values</li>
- *   <li>Support for Java Time API types</li>
- *   <li>A single immutable {@link Gson} instance shared across the application</li>
+ *   <li>Consistent {@code snake_case} field naming using {@link com.google.gson.FieldNamingPolicy#LOWER_CASE_WITH_UNDERSCORES}</li>
+ *   <li>Explicit serialization of {@code null} values to preserve API contracts</li>
+ *   <li>A single, immutable {@link Gson} instance shared across the application</li>
+ * </ul>
+ * <p>
+ * This component is designed to be framework-agnostic and can be safely used
+ * in core libraries, SDKs, utilities, and shared components without introducing
+ * dependencies on web or application frameworks.
+ * <p>
+ * <strong>Usage guidelines:</strong>
+ * <ul>
+ *   <li>All JSON serialization and deserialization within the library MUST use {@link #gson()}.</li>
+ *   <li>Consumers should not create custom {@link Gson} instances to avoid contract inconsistencies.</li>
+ *   <li>No Jackson annotations or serializers should be used in conjunction with this helper.</li>
  * </ul>
  *
  * <p>
@@ -31,18 +40,15 @@ import java.util.Objects;
  * @author TumiPay SAS.
  * @since 6/01/2026
  */
+
 @UtilityClass
 public class CommonJsonUtils {
 
     private static final Gson GSON = new GsonBuilder()
-
-        // JSON contract
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+        .registerTypeAdapter(Instant.class, instantSerializer())
+        .registerTypeAdapter(Instant.class, instantDeserializer())
         .serializeNulls()
-
-        // Java Time support
-        .registerTypeAdapter(Instant.class, new InstantTypeAdapter())
-
         .create();
 
     public static Gson gson() {
@@ -96,7 +102,7 @@ public class CommonJsonUtils {
     }
 
     /**
-     * Converts JSON string to generic type.
+     * Converts JSON string to generic type (List, Map, etc.)
      */
     public static <T> T fromJson(String json, Type type) {
         return GSON.fromJson(json, type);
@@ -114,8 +120,7 @@ public class CommonJsonUtils {
      * Converts JSON string to Map.
      */
     public static Map<String, Object> fromJsonToMap(String json) {
-        Type type = new TypeToken<Map<String, Object>>() {
-        }.getType();
+        Type type = new TypeToken<Map<String, Object>>() {}.getType();
         return GSON.fromJson(json, type);
     }
 
@@ -124,7 +129,7 @@ public class CommonJsonUtils {
     // =========================
 
     /**
-     * Validates if a string is valid JSON.
+     * Validates if a string is a valid JSON.
      */
     public static boolean isValidJson(String json) {
         try {
@@ -135,20 +140,11 @@ public class CommonJsonUtils {
         }
     }
 
-    /**
-     * Gson adapter for java.time.Instant.
-     */
-    private static final class InstantTypeAdapter
-        implements JsonSerializer<Instant>, JsonDeserializer<Instant> {
+    private static JsonSerializer<Instant> instantSerializer() {
+        return (src, typeOfSrc, context) -> context.serialize(src.toString());
+    }
 
-        @Override
-        public JsonElement serialize(Instant src, Type typeOfSrc, JsonSerializationContext context) {
-            return new JsonPrimitive(src.toString());
-        }
-
-        @Override
-        public Instant deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
-            return Instant.parse(json.getAsString());
-        }
+    private static JsonDeserializer<Instant> instantDeserializer() {
+        return (json, typeOfT, context) -> Instant.parse(json.getAsString());
     }
 }

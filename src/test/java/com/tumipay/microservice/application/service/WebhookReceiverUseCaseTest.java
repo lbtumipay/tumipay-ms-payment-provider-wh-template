@@ -91,16 +91,13 @@ class WebhookReceiverUseCaseTest {
             .transactionStatus(TransactionStatusEnum.APPROVED)
             .providerTransactionId("TXN-001")
             .build();
-        DomainOperationResult<WebhookEvent> updateResult = DomainOperationResult.success(event);
-
         when(webhookEventDomainService.findReceivedBatch(5)).thenReturn(Flux.just(event));
         when(webhookEventTypeClassifierService.classifyWebhook(event.getEventRequest())).thenReturn(classifierResult);
-        when(webhookEventDomainService.updateDomainEntity(any())).thenReturn(Mono.just(updateResult));
 
         StepVerifier.create(useCase.processReceivedBatch(5))
             .verifyComplete();
 
-        verify(webhookEventDomainService).updateDomainEntity(any());
+        verify(webhookEventDomainService, never()).updateDomainEntity(any());
         verifyNoInteractions(providerTransactionDomainService);
     }
 
@@ -112,16 +109,13 @@ class WebhookReceiverUseCaseTest {
             .classifiedType(WebhookEventTypeEnum.PAYIN_TRANSACTION_REJECTED)
             .transactionStatus(TransactionStatusEnum.REJECTED)
             .build();
-        DomainOperationResult<WebhookEvent> updateResult = DomainOperationResult.success(event);
-
         when(webhookEventDomainService.findReceivedBatch(5)).thenReturn(Flux.just(event));
         when(webhookEventTypeClassifierService.classifyWebhook(any())).thenReturn(classifierResult);
-        when(webhookEventDomainService.updateDomainEntity(any())).thenReturn(Mono.just(updateResult));
 
         StepVerifier.create(useCase.processReceivedBatch(5))
             .verifyComplete();
 
-        verify(webhookEventDomainService).updateDomainEntity(any());
+        verify(webhookEventDomainService, never()).updateDomainEntity(any());
         verifyNoInteractions(providerTransactionDomainService);
     }
 
@@ -286,7 +280,7 @@ class WebhookReceiverUseCaseTest {
     void shouldPropagateErrorWhenWebhookUpdateFails() {
         WebhookEvent event = buildEvent(9L, "{}");
         WebhookClassifierResult classifierResult = WebhookClassifierResult.builder()
-            .classifiedType(WebhookEventTypeEnum.PAYIN_TRANSACTION_APPROVED)
+            .classifiedType(WebhookEventTypeEnum.UNKNOWN_EVENT)
             .build();
         DomainOperationResult<WebhookEvent> failedUpdateResult = DomainOperationResult.failure("DB error");
 
@@ -307,7 +301,7 @@ class WebhookReceiverUseCaseTest {
         WebhookEvent event1 = buildEvent(10L, "{}");
         WebhookEvent event2 = buildEvent(11L, "{}");
         WebhookClassifierResult classifierResult = WebhookClassifierResult.builder()
-            .classifiedType(WebhookEventTypeEnum.PAYIN_TRANSACTION_APPROVED)
+            .classifiedType(WebhookEventTypeEnum.UNKNOWN_EVENT)
             .build();
         DomainOperationResult<WebhookEvent> successResult = DomainOperationResult.success(event2);
 
@@ -360,7 +354,7 @@ class WebhookReceiverUseCaseTest {
         StepVerifier.create(useCase.processReceivedBatch(5))
             .verifyComplete();
 
-        verify(webhookEventDomainService, times(2)).updateDomainEntity(any());
+        verify(webhookEventDomainService, times(1)).updateDomainEntity(any());
         verify(providerTransactionDomainService).getByProviderTransactionId("TXN-MIXED");
         verify(providerTransactionDomainService).updateDomainEntity(any());
     }

@@ -47,6 +47,15 @@ public class ProviderWebhookEventEntity implements Serializable {
     @Column("pwe_event_type")
     private String eventType;
 
+    @Column("pwe_transaction_id")
+    private String transactionId;
+
+    @Column("pwe_reference_id")
+    private String referenceId;
+
+    @Column("pwe_provider_transaction_id")
+    private String providerTransactionId;
+
     @Column("pwe_external_event_id")
     private String externalEventId;
 

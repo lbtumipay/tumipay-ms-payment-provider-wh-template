@@ -270,9 +270,20 @@ public class WebhookReceiverUseCase implements IWebhookReceiverUseCase {
      * event type stored in the composition.
      */
     private Mono<Void> transitionCompositionWebhookToPending(WebhookReceiverComposition composition) {
+
+        final WebhookEvent webhookEvent = composition.getWebhookEvent();
+        final WebhookEventTypeEnum webhookEventType = composition.getWebhookClassifierResult().getClassifiedType();
+        final ProviderTransaction providerTransaction = composition.getProviderTransaction();
+
+        if(providerTransaction != null) {
+            webhookEvent.setProviderTransactionId(providerTransaction.getProviderTransactionId());
+            webhookEvent.setTransactionId(providerTransaction.getTransactionId());
+            webhookEvent.setReferenceId(providerTransaction.getReferenceId());
+        }
+
         return transitionWebhookToPending(
-            composition.getWebhookEvent(),
-            composition.getWebhookClassifierResult().getClassifiedType()
+            webhookEvent,
+            webhookEventType
         );
     }
 
@@ -290,11 +301,9 @@ public class WebhookReceiverUseCase implements IWebhookReceiverUseCase {
             webhookClassifierResult.getClassifiedType()
         );
 
-        return transitionWebhookToPending(
-            event,
-            webhookClassifierResult.getClassifiedType()
-        );
+        return Mono.empty();
     }
+
 
     /**
      * Updates the webhook webhookEvent processing status from RECEIVED to PENDING and

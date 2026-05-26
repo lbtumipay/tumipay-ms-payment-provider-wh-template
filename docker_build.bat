@@ -10,7 +10,7 @@ REM Obtener nombre del directorio actual (nombre del microservicio)
 for %%i in (.) do set SERVICE_NAME=%%~ni
 
 REM Definir version (puedes cambiarla si necesitas versionado dinámico)
-set VERSION=1.0.1
+set VERSION=1.0.0
 
 echo Building service: %SERVICE_NAME%
 echo Version: %VERSION%

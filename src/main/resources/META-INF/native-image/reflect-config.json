@@ -210,5 +210,26 @@
         "allDeclaredFields": true,
         "allDeclaredConstructors": true,
         "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.domain.model.provider.ProviderWebhookEvent",
+        "comment": "Outbound ProviderWebhookEvent DTO serialized to JSON using Jackson inside WebClient",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.domain.model.provider.WebhookEventResult",
+        "comment": "Outbound WebhookEventResult",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
+    },
+    {
+        "name": "com.tumipay.microservice.domain.model.provider.WebhookClassifierResult",
+        "comment": "Outbound WebhookClassifierResult",
+        "allDeclaredFields": true,
+        "allDeclaredConstructors": true,
+        "allDeclaredMethods": true
     }
 ]

@@ -26,7 +26,7 @@ public class ProviderWebhookRequest implements Serializable {
     @Serial
     private static final long serialVersionUID = -7823649870234561234L;
 
-    @JsonProperty("event_id")
+    @JsonProperty("id")
     private String eventId;
 
     @JsonProperty("event_key")
@@ -34,4 +34,7 @@ public class ProviderWebhookRequest implements Serializable {
 
     @JsonProperty("content")
     private Object content;
+
+    @JsonProperty("created_at")
+    private String createdAt;
 }

@@ -3,11 +3,10 @@ package com.tumipay.microservice.infrastructure.adapter.output.persistence;
 import com.tumipay.microservice.domain.component.enums.WebhookProcessingStatusEnum;
 import com.tumipay.microservice.domain.model.webhook.WebhookEvent;
 import com.tumipay.microservice.domain.port.output.IWebhookWorkerRepositoryPort;
-import com.tumipay.microservice.infrastructure.adapter.output.persistence.entity.ProviderWebhookEventEntity;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.mapper.IProviderWebhookEventPersistenceMapper;
+import com.tumipay.microservice.infrastructure.adapter.output.persistence.mapper.ProviderWebhookEventMapperComponent;
 import com.tumipay.microservice.infrastructure.adapter.output.persistence.repository.IProviderWebhookEventR2dbcRepository;
 import com.tumipay.microservice.shared.properties.WebhookDispatcherProperties;
-import com.tumipay.microservice.shared.util.CommonInstantUtils;
 import com.tumipay.microservice.shared.util.CommonIntegerUtils;
 import com.tumipay.microservice.shared.util.CommonStringUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -19,8 +18,6 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.util.Map;
-import java.util.UUID;
 
 /**
  * WebhookWorkerRepositoryAdapter
@@ -49,10 +46,11 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class WebhookWorkerRepositoryAdapter implements IWebhookWorkerRepositoryPort {
 
-    private final DatabaseClient databaseClient;
+    private final IProviderWebhookEventR2dbcRepository providerWebhookEventR2dbcRepository;
+    private final ProviderWebhookEventMapperComponent providerWebhookEventMapperComponent;
     private final IProviderWebhookEventPersistenceMapper webhookEventPersistenceMapper;
     private final WebhookDispatcherProperties webhookDispatcherProperties;
-    private final IProviderWebhookEventR2dbcRepository providerWebhookEventR2dbcRepository;
+    private final DatabaseClient databaseClient;
 
     /**
      * {@inheritDoc}
@@ -95,12 +93,18 @@ public class WebhookWorkerRepositoryAdapter implements IWebhookWorkerRepositoryP
             RETURNING t.*
             """.formatted(workerTimeoutMinutes);
 
+        log.debug("Executing claimBatch SQL | batchSize={} | workerTimeoutMinutes={}min | SQL={}",
+            effectiveBatchSize,
+            workerTimeoutMinutes,
+            sql
+        );
+
         return databaseClient.sql(sql)
             .bind("workerId", workerId)
             .bind("batchSize", effectiveBatchSize)
             .fetch()
             .all()
-            .map(this::mapRowToEntity)
+            .map(providerWebhookEventMapperComponent::mapRowToEntity)
             .map(webhookEventPersistenceMapper::toDomain)
             .doOnSubscribe(sub ->
                 log.debug("ClaimBatch started | workerId={} | batchSize={} | timeout={}min",
@@ -248,11 +252,17 @@ public class WebhookWorkerRepositoryAdapter implements IWebhookWorkerRepositoryP
             RETURNING t.*
             """.formatted(validatingTimeoutMinutes);
 
+        log.debug("Executing findReceivedBatch SQL | batchSize={} | validatingTimeout={}min | SQL={}",
+            effectiveBatchSize,
+            validatingTimeoutMinutes,
+            sql
+        );
+
         return databaseClient.sql(sql)
             .bind("batchSize", effectiveBatchSize)
             .fetch()
             .all()
-            .map(this::mapRowToEntity)
+            .map(providerWebhookEventMapperComponent::mapRowToEntity)
             .map(webhookEventPersistenceMapper::toDomain)
             .doOnSubscribe(sub ->
                 log.debug("FindReceivedBatch started | batchSize={} | validatingTimeout={}min",
@@ -268,28 +278,5 @@ public class WebhookWorkerRepositoryAdapter implements IWebhookWorkerRepositoryP
                     error.getMessage()
                 )
             );
-    }
-
-    private ProviderWebhookEventEntity mapRowToEntity(Map<String, Object> row) {
-        return ProviderWebhookEventEntity.builder()
-            .id(row.get("pwe_id") != null ? ((Number) row.get("pwe_id")).longValue() : null)
-            .uuid(row.get("pwe_uuid") != null ? UUID.fromString(row.get("pwe_uuid").toString()) : null)
-            .adapterProviderCode((String) row.get("pwe_adapter_provider_code"))
-            .eventType((String) row.get("pwe_event_type"))
-            .externalEventId((String) row.get("pwe_external_event_id"))
-            .idempotencyKey((String) row.get("pwe_idempotency_key"))
-            .processingStatus((String) row.get("pwe_processing_status"))
-            .errorCode((String) row.get("pwe_error_code"))
-            .retryCount(row.get("pwe_retry_count") != null ? ((Number) row.get("pwe_retry_count")).intValue() : 0)
-            .lastError((String) row.get("pwe_last_error"))
-            .eventRequest((String) row.get("pwe_event_request"))
-            .claimedBy((String) row.get("pwe_claimed_by"))
-            .claimedAt(CommonInstantUtils.toInstant(row.get("pwe_claimed_at")))
-            .nextRetryAt(CommonInstantUtils.toInstant(row.get("pwe_next_retry_at")))
-            .updatedAt(CommonInstantUtils.toInstant(row.get("pwe_updated_at")))
-            .receivedAt(CommonInstantUtils.toInstant(row.get("pwe_received_at")))
-            .processedAt(CommonInstantUtils.toInstant(row.get("pwe_processed_at")))
-            .createdAt(CommonInstantUtils.toInstant(row.get("pwe_created_at")))
-            .build();
     }
 }

@@ -1,5 +1,6 @@
 package com.tumipay.microservice.domain.model.provider;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import java.io.Serial;
@@ -29,9 +30,15 @@ public class ProviderWebhookEvent implements Serializable {
     @Serial
     private static final long serialVersionUID = -8555744880770987231L;
 
+    @JsonProperty("id")
     private String eventId;
 
+    @JsonProperty("event_key")
     private String eventKey;
 
+    @JsonProperty("content")
     private Map<String, Object> content;
+
+    @JsonProperty("created_at")
+    private String createdAt;
 }
