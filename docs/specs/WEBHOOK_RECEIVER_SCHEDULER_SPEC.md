@@ -784,7 +784,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * <p>
  * Scheduled component that drives the first stage of the webhook processing pipeline.
  * Polls the {@code tp_provider_webhook_event} table for events in {@code RECEIVED} status
- * and pre-processes them before they reach the {@link WebhookWorkerScheduler}.
+ * and pre-processes them before they reach the {@link WebhookDispatchScheduler}.
  * <p>
  * For {@code PAYOUT_TRANSACTION} events: looks up the provider transaction, updates its
  * status based on the webhook payload, then transitions the webhook to {@code PENDING}.

@@ -106,7 +106,7 @@ public class ProviderTransactionEntity implements Serializable {
      * Monetary value of the transaction.
      */
     @Column("pt_amount")
-    private BigDecimal amount;
+    private Long amount;
 
     /**
      * Currency code of the transaction amount (ISO 4217).

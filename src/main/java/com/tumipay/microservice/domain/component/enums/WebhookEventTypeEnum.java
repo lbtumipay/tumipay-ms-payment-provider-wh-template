@@ -25,16 +25,6 @@ public enum WebhookEventTypeEnum {
     PAYIN_TRANSACTION_REJECTED,
 
     /**
-     * Enum representing a pending pay-in transaction webhook event.
-     */
-    PAYIN_TRANSACTION_PENDING,
-
-    /**
-     * Enum representing an expired pay-in transaction webhook event.
-     */
-    PAYIN_TRANSACTION_EXPIRED,
-
-    /**
      * Enum representing a technical error in a pay-in transaction webhook event.
      */
     PAYIN_TRANSACTION_ERROR,

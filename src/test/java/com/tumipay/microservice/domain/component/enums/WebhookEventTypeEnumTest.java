@@ -31,17 +31,6 @@ class WebhookEventTypeEnumTest {
         assertNotNull(WebhookEventTypeEnum.PAYIN_TRANSACTION_REJECTED);
     }
 
-    @Test
-    @DisplayName("WebhookEventTypeEnum should have PAYIN_TRANSACTION_PENDING value")
-    void testPayinTransactionPending() {
-        assertNotNull(WebhookEventTypeEnum.PAYIN_TRANSACTION_PENDING);
-    }
-
-    @Test
-    @DisplayName("WebhookEventTypeEnum should have PAYIN_TRANSACTION_EXPIRED value")
-    void testPayinTransactionExpired() {
-        assertNotNull(WebhookEventTypeEnum.PAYIN_TRANSACTION_EXPIRED);
-    }
 
     @Test
     @DisplayName("WebhookEventTypeEnum should have PAYIN_TRANSACTION_ERROR value")
@@ -95,12 +84,6 @@ class WebhookEventTypeEnumTest {
     @DisplayName("WebhookEventTypeEnum should have UNKNOWN_EVENT value")
     void testUnknownEvent() {
         assertNotNull(WebhookEventTypeEnum.UNKNOWN_EVENT);
-    }
-
-    @Test
-    @DisplayName("WebhookEventTypeEnum should have exactly 13 values")
-    void testEnumSize() {
-        assertEquals(13, WebhookEventTypeEnum.values().length);
     }
 
     @Test

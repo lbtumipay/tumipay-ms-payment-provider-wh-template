@@ -49,7 +49,7 @@ class PaymentAdapterTransactionMapperTest {
             .providerTransactionId("PROV-TX-001")
             .providerReferenceId("PROV-REF-001")
             .idempotencyKey("IDEM-001")
-            .amount(10000)
+            .amount(10000L)
             .currency("COP")
             .transactionType(TransactionTypeEnum.PAYIN_TRANSACTION)
             .status(TransactionStatusEnum.APPROVED)
@@ -65,24 +65,24 @@ class PaymentAdapterTransactionMapperTest {
         ProviderTransactionEntity entity = mapper.toEntity(domain);
 
         assertNotNull(entity);
-        assertEquals(1L,                                          entity.getId());
-        assertEquals("tx-uuid-001",                               entity.getUuid());
-        assertEquals("TX-001",                                    entity.getTransactionId());
-        assertEquals("REF-001",                                   entity.getReferenceId());
-        assertEquals("PROV_001",                                  entity.getAdapterProviderCode());
-        assertEquals("PROV-TX-001",                               entity.getProviderTransactionId());
-        assertEquals("PROV-REF-001",                              entity.getProviderReferenceId());
-        assertEquals("IDEM-001",                                  entity.getIdempotencyKey());
-        assertEquals(BigDecimal.valueOf(10000),                    entity.getAmount());
-        assertEquals("COP",                                       entity.getCurrency());
+        assertEquals(1L, entity.getId());
+        assertEquals("tx-uuid-001", entity.getUuid());
+        assertEquals("TX-001", entity.getTransactionId());
+        assertEquals("REF-001", entity.getReferenceId());
+        assertEquals("PROV_001", entity.getAdapterProviderCode());
+        assertEquals("PROV-TX-001", entity.getProviderTransactionId());
+        assertEquals("PROV-REF-001", entity.getProviderReferenceId());
+        assertEquals("IDEM-001", entity.getIdempotencyKey());
+        assertEquals(10000L, entity.getAmount());
+        assertEquals("COP", entity.getCurrency());
         assertEquals(TransactionTypeEnum.PAYIN_TRANSACTION.name(), entity.getTransactionType());
-        assertEquals(TransactionStatusEnum.APPROVED.name(),        entity.getStatus());
-        assertEquals(PaymentMethodEnum.CARD.name(),                entity.getPaymentMethod());
+        assertEquals(TransactionStatusEnum.APPROVED.name(), entity.getStatus());
+        assertEquals(PaymentMethodEnum.CARD.name(), entity.getPaymentMethod());
         assertNull(entity.getErrorCode());
-        assertEquals("{\"bank\":\"BANCOLOMBIA\"}",                 entity.getMetadata());
-        assertEquals(now,                                         entity.getProviderProcessedAt());
-        assertEquals(now,                                         entity.getCreatedAt());
-        assertEquals(now,                                         entity.getUpdatedAt());
+        assertEquals("{\"bank\":\"BANCOLOMBIA\"}", entity.getMetadata());
+        assertEquals(now, entity.getProviderProcessedAt());
+        assertEquals(now, entity.getCreatedAt());
+        assertEquals(now, entity.getUpdatedAt());
     }
 
     @Test
@@ -99,8 +99,8 @@ class PaymentAdapterTransactionMapperTest {
         ProviderTransactionEntity entity = mapper.toEntity(domain);
 
         assertEquals(TransactionStatusEnum.ERROR.name(), entity.getStatus());
-        assertEquals("CARD_DECLINED",                    entity.getErrorCode());
-        assertEquals("insufficient funds",               entity.getErrorMessage());
+        assertEquals("CARD_DECLINED", entity.getErrorCode());
+        assertEquals("insufficient funds", entity.getErrorMessage());
     }
 
     @Test
@@ -131,7 +131,7 @@ class PaymentAdapterTransactionMapperTest {
             .providerTransactionId("PROV-TX-003")
             .providerReferenceId("PROV-REF-003")
             .idempotencyKey("IDEM-003")
-            .amount(new BigDecimal("50000.00"))
+            .amount(50000L)
             .currency("USD")
             .transactionType(TransactionTypeEnum.PAYOUT_TRANSACTION.name())
             .status(TransactionStatusEnum.PENDING.name())
@@ -147,14 +147,14 @@ class PaymentAdapterTransactionMapperTest {
         ProviderTransaction domain = mapper.toDomain(entity);
 
         assertNotNull(domain);
-        assertEquals(2L,                                             domain.getId());
-        assertEquals("tx-uuid-003",                                  domain.getUuid());
-        assertEquals("TX-003",                                       domain.getTransactionId());
-        assertEquals("PROV_002",                                     domain.getAdapterProviderCode());
-        assertEquals(TransactionTypeEnum.PAYOUT_TRANSACTION.name(),  entity.getTransactionType());
-        assertEquals("USD",                                          domain.getCurrency());
-        assertEquals("{\"channel\":\"web\"}",                        domain.getMetadata());
-        assertEquals(now,                                            domain.getCreatedAt());
+        assertEquals(2L, domain.getId());
+        assertEquals("tx-uuid-003", domain.getUuid());
+        assertEquals("TX-003", domain.getTransactionId());
+        assertEquals("PROV_002", domain.getAdapterProviderCode());
+        assertEquals(TransactionTypeEnum.PAYOUT_TRANSACTION.name(), entity.getTransactionType());
+        assertEquals("USD", domain.getCurrency());
+        assertEquals("{\"channel\":\"web\"}", domain.getMetadata());
+        assertEquals(now, domain.getCreatedAt());
     }
 
     @Test
@@ -182,11 +182,11 @@ class PaymentAdapterTransactionMapperTest {
 
         ProviderTransaction roundTrip = mapper.toDomain(mapper.toEntity(original));
 
-        assertEquals(original.getUuid(),               roundTrip.getUuid());
-        assertEquals(original.getTransactionId(),      roundTrip.getTransactionId());
+        assertEquals(original.getUuid(), roundTrip.getUuid());
+        assertEquals(original.getTransactionId(), roundTrip.getTransactionId());
         assertEquals(original.getAdapterProviderCode(), roundTrip.getAdapterProviderCode());
-        assertEquals(original.getCurrency(),           roundTrip.getCurrency());
-        assertEquals(original.getMetadata(),           roundTrip.getMetadata());
+        assertEquals(original.getCurrency(), roundTrip.getCurrency());
+        assertEquals(original.getMetadata(), roundTrip.getMetadata());
     }
 }
 

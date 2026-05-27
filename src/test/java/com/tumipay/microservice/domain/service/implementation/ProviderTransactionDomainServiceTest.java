@@ -61,7 +61,7 @@ class ProviderTransactionDomainServiceTest {
             .currency("COP")
             .paymentMethod(PaymentMethodEnum.CARD)
             .status(TransactionStatusEnum.PENDING)
-            .amount(15000)
+            .amount(15000L)
             .createdAt(Instant.now())
             .build();
     }
@@ -165,7 +165,7 @@ class ProviderTransactionDomainServiceTest {
     @Test
     void saveDomainEntity_invalidAmount_shouldReturnFailure() {
         ProviderTransaction entity = validCreateEntity();
-        entity.setAmount(0);
+        entity.setAmount(0L);
         StepVerifier.create(service.saveDomainEntity(entity))
             .assertNext(r -> assertEquals(BaseOperationStatusEnum.FAILED, r.getStatus()))
             .verifyComplete();

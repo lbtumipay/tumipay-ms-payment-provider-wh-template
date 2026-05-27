@@ -27,6 +27,6 @@ public class Amount implements Serializable {
 
     @Serial
     private static final long serialVersionUID = -8555744880770987231L;
-    private Integer value;
+    private Long value;
     private String currency;
 }

@@ -5,7 +5,7 @@ import com.tumipay.microservice.domain.component.enums.WebhookProcessingStatusEn
 import com.tumipay.microservice.domain.model.provider.ProviderTransaction;
 import com.tumipay.microservice.domain.model.webhook.WebhookClassifierResult;
 import com.tumipay.microservice.domain.model.webhook.WebhookEvent;
-import com.tumipay.microservice.domain.port.input.IWebhookWorkerUseCase;
+import com.tumipay.microservice.domain.port.input.IWebhookDispatchUseCase;
 import com.tumipay.microservice.domain.port.output.IPaymentGatewayWebhookAdapterPort;
 import com.tumipay.microservice.domain.service.contract.IProviderTransactionDomainService;
 import com.tumipay.microservice.domain.service.contract.IProviderWebhookEventClassifierService;
@@ -35,7 +35,7 @@ import reactor.core.publisher.Mono;
 @Log4j2
 @Service
 @RequiredArgsConstructor
-public class WebhookDispatchUseCase implements IWebhookWorkerUseCase {
+public class WebhookDispatchUseCase implements IWebhookDispatchUseCase {
 
     private final IProviderWebhookEventDomainService providerWebhookEventDomainService;
     private final WebhookDispatcherProperties webhookDispatcherProperties;

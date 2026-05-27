@@ -202,7 +202,7 @@ public class ProviderTransactionDomainService implements IProviderTransactionDom
             CommonValidationUtils.validateRequiredEnum(transaction.getPaymentMethod(), "paymentMethod", errors);
             CommonValidationUtils.validateRequiredEnum(transaction.getStatus(), "status", errors);
 
-            if (transaction.getAmount() == null || transaction.getAmount().compareTo(0) <= 0) {
+            if (transaction.getAmount() == null || transaction.getAmount().compareTo(0L) <= 0) {
                 errors.add("The amount is required and must be greater than zero");
             }
 

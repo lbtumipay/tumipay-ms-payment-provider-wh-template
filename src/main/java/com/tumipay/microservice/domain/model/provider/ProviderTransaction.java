@@ -40,7 +40,7 @@ public class ProviderTransaction implements Serializable {
     private String providerTransactionId;
     private String providerReferenceId;
     private String idempotencyKey;
-    private Integer amount;
+    private Long amount;
     private String currency;
     private TransactionTypeEnum transactionType;
     private TransactionStatusEnum status;
